@@ -1,18 +1,16 @@
 package game
 
 import (
-	"go_rts/render"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	tileImage *ebiten.Image
+	gameMap *GameMap
 }
 
 func NewGame() Game {
 	return Game{
-		tileImage: render.NewImageFromPath("./assets/block.png"),
+		gameMap: NewMap(),
 	}
 }
 
@@ -21,10 +19,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(10.0, 10.0)
-
-	screen.DrawImage(g.tileImage, op)
+	g.gameMap.DrawMap(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
