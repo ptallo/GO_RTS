@@ -47,7 +47,7 @@ func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
 		isoPoint := render.CartoToIso(tile.point)
 
 		opts := &ebiten.DrawImageOptions{}
-		opts.GeoM.Translate(isoPoint.X, isoPoint.Y)
+		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
 		camera.DrawImage(screen, imageToDraw, opts)
 	}
 }

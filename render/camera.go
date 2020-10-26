@@ -15,7 +15,7 @@ func NewCamera() Camera {
 }
 
 func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOptions) {
-	opts.GeoM.Translate(c.translation.X, c.translation.Y)
+	opts.GeoM.Translate(c.translation.x, c.translation.y)
 	screen.DrawImage(img, opts)
 }
 
