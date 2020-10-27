@@ -19,14 +19,6 @@ func NewImageFromPath(path string) *ebiten.Image {
 	if err != nil {
 		panic(err)
 	}
-	return ebiten.NewImageFromImage(img)
-}
 
-func CloneImage(origImage *ebiten.Image) *ebiten.Image {
-	w, h := origImage.Size()
-	img := ebiten.NewImage(w, h)
-	op := &ebiten.DrawImageOptions{}
-	op.ColorM.Scale(1, 1, 1, 0.5)
-	img.DrawImage(origImage, op)
-	return img
+	return ebiten.NewImageFromImage(img)
 }

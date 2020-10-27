@@ -11,15 +11,19 @@ type GameMap struct {
 	imageMap map[string]*ebiten.Image
 }
 
+type Tile struct {
+	name  string
+	point render.Point
+}
+
 func NewMap() *GameMap {
 	tiles := make([]*Tile, 0)
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 4; j++ {
-			p := Point{
-				x: float64((i + 1) * 64),
-				y: float64((j + 1) * 64),
-			}
-			p = CartoToIso(p)
+			p := render.NewPoint(
+				float64((i+1)*64),
+				float64((j+1)*64),
+			)
 
 			tile := Tile{
 				name:  "grass",
@@ -36,18 +40,16 @@ func NewMap() *GameMap {
 	}
 }
 
-func (m *GameMap) DrawMap(screen *ebiten.Image) {
+func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
 	for i := range m.tiles {
 		tile := m.tiles[i]
-		opts := &ebiten.DrawImageOptions{}
-		opts.GeoM.Translate(tile.point.x, tile.point.y)
-		screen.DrawImage(m.imageMap[tile.name], opts)
-	}
-}
+		imageToDraw := m.imageMap[tile.name]
+		isoPoint := render.CartoToIso(tile.point)
 
-type Tile struct {
-	name  string
-	point Point
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
+		camera.DrawImage(screen, imageToDraw, opts)
+	}
 }
 
 func NewTileNameToImageMap() map[string]*ebiten.Image {
