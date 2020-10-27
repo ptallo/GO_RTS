@@ -13,7 +13,6 @@ type Game struct {
 
 func NewGame() Game {
 	cam := render.NewCamera()
-	// cam.MoveCamera(render.NewPoint(-64.0, -64.0))
 	return Game{
 		gameMap: NewMap(),
 		camera:  &cam,
@@ -21,6 +20,7 @@ func NewGame() Game {
 }
 
 func (g *Game) Update() error {
+	g.camera.UpdateCameraPosition()
 	return nil
 }
 
