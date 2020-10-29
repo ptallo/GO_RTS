@@ -1,4 +1,4 @@
-package render
+package objects
 
 type Point struct {
 	x float64
@@ -23,6 +23,10 @@ func (p Point) Y() float64 {
 func (p *Point) Move(point Point) {
 	p.x += point.x
 	p.y += point.y
+}
+
+func (p Point) Inverse() Point {
+	return NewPoint(-p.x, -p.y)
 }
 
 func CartoToIso(p Point) Point {
