@@ -65,9 +65,17 @@ func (g *Game) updateCameraPosition() {
 }
 
 func (g *Game) isScreenAndMapOverlapping() bool {
+	// Get the rectangle describing the screen
 	width, height := ebiten.WindowSize()
 	screenOrigin := g.camera.Translation()
 	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X(), screenOrigin.Y())
-	mapRect := g.gameMap.GetMapRectangle()
-	return screenRect.IsOverlapping(mapRect)
+
+	points := g.gameMap.getMapPoints(1.0)
+
+	for _, p := range points {
+		if screenRect.Contains(p) {
+			return true
+		}
+	}
+	return false
 }

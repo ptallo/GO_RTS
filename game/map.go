@@ -3,7 +3,6 @@ package game
 import (
 	"go_rts/geometry"
 	"go_rts/render"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -23,14 +22,14 @@ type Tile struct {
 
 func NewMap() *GameMap {
 	tiles := make([]*Tile, 0)
-	n := 20
+	n := 10
 	tileW := 64.0
 	tileH := 64.0
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			p := geometry.NewPoint(
-				float64(i+1)*tileW,
-				float64(j+1)*tileH,
+				float64(i)*tileW,
+				float64(j)*tileH,
 			)
 
 			tileName := "grass"
@@ -49,7 +48,7 @@ func NewMap() *GameMap {
 
 	return &GameMap{
 		tiles:      tiles,
-		imageMap:   NewTileNameToImageMap(),
+		imageMap:   newTileNameToImageMap(),
 		tileNum:    n,
 		tileWidth:  tileW,
 		tileHeight: tileH,
@@ -57,8 +56,7 @@ func NewMap() *GameMap {
 }
 
 func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
-	for i := range m.tiles {
-		tile := m.tiles[i]
+	for _, tile := range m.tiles {
 		imageToDraw := m.imageMap[tile.name]
 		isoPoint := geometry.CartoToIso(tile.point)
 
@@ -68,30 +66,31 @@ func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
 	}
 }
 
-func (m *GameMap) GetMapRectangle() geometry.Rectangle {
-	p1, p2, p3, p4 := m.getMapCorners()
-	minX := math.Min(math.Min(p1.X(), p2.X()), math.Min(p3.X(), p4.X()))
-	maxX := math.Max(math.Max(p1.X(), p2.X()), math.Max(p3.X(), p4.X()))
-	minY := math.Min(math.Min(p1.Y(), p2.Y()), math.Min(p3.Y(), p4.Y()))
-	maxY := math.Max(math.Max(p1.Y(), p2.Y()), math.Max(p3.Y(), p4.Y()))
-	return geometry.NewRectangle(maxX-minX, maxY-minY, minX, minY)
-}
-
-func (m *GameMap) getMapCorners() (geometry.Point, geometry.Point, geometry.Point, geometry.Point) {
+func (m *GameMap) getMapPoints(numTilesToGoIn float64) []geometry.Point {
 	n := float64(m.tileNum)
-	tileIn := 2.0
-	minX := m.tileWidth * tileIn
-	minY := m.tileHeight * tileIn
-	maxX := m.tileWidth * (n - tileIn)
-	maxY := m.tileHeight * (n - tileIn)
-	p1 := geometry.CartoToIso(geometry.NewPoint(minX, minY))
-	p2 := geometry.CartoToIso(geometry.NewPoint(minX, maxY))
-	p3 := geometry.CartoToIso(geometry.NewPoint(maxX, minY))
-	p4 := geometry.CartoToIso(geometry.NewPoint(maxX, maxY))
-	return p1, p2, p3, p4
+	points := make([]geometry.Point, 0)
+	for i := numTilesToGoIn; i < n-numTilesToGoIn; i++ {
+		for j := numTilesToGoIn; j < n-numTilesToGoIn; j++ {
+			ps := m.getTileCorners(i, j)
+			points = append(points, ps...)
+		}
+	}
+	return points
 }
 
-func NewTileNameToImageMap() map[string]*ebiten.Image {
+func (m *GameMap) getTileCorners(i, j float64) []geometry.Point {
+	w := m.tileWidth
+	h := m.tileHeight
+	points := []geometry.Point{
+		geometry.CartoToIso(geometry.NewPoint(i*w, j*h)),
+		geometry.CartoToIso(geometry.NewPoint((i+1)*w, j*h)),
+		geometry.CartoToIso(geometry.NewPoint(i*w, (j+1)*h)),
+		geometry.CartoToIso(geometry.NewPoint((i+1)*w, (j+1)*h)),
+	}
+	return points
+}
+
+func newTileNameToImageMap() map[string]*ebiten.Image {
 	return map[string]*ebiten.Image{
 		"grass": render.NewImageFromPath("./assets/tiles/grass.png"),
 		"water": render.NewImageFromPath("./assets/tiles/water.png"),
