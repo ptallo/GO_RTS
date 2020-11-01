@@ -23,7 +23,7 @@ func (r Rectangle) Move(x, y float64) {
 	r.point.Move(NewPoint(x, y))
 }
 
-func (r1 Rectangle) IsOverlapping(r2 Rectangle) bool {
+func (r1 Rectangle) Intersects(r2 Rectangle) bool {
 	if r1.point.x >= r2.point.x+r2.width || r2.point.x >= r1.point.x+r1.width {
 		return false
 	}
@@ -31,6 +31,10 @@ func (r1 Rectangle) IsOverlapping(r2 Rectangle) bool {
 		return false
 	}
 	return true
+}
+
+func (r Rectangle) Contains(p Point) bool {
+	return r.point.x <= p.x && r.point.x+r.width >= p.x && r.point.y <= p.y && r.point.y+r.height >= p.y
 }
 
 func (r Rectangle) ToString() string {
