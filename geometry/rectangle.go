@@ -1,4 +1,4 @@
-package objects
+package geometry
 
 import (
 	"fmt"

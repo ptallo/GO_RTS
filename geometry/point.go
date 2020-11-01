@@ -1,4 +1,4 @@
-package objects
+package geometry
 
 type Point struct {
 	x float64

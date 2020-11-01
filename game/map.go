@@ -1,7 +1,7 @@
 package game
 
 import (
-	"go_rts/objects"
+	"go_rts/geometry"
 	"go_rts/render"
 	"math"
 
@@ -18,7 +18,7 @@ type GameMap struct {
 
 type Tile struct {
 	name  string
-	point objects.Point
+	point geometry.Point
 }
 
 func NewMap() *GameMap {
@@ -28,7 +28,7 @@ func NewMap() *GameMap {
 	tileH := 64.0
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
-			p := objects.NewPoint(
+			p := geometry.NewPoint(
 				float64(i+1)*tileW,
 				float64(j+1)*tileH,
 			)
@@ -60,7 +60,7 @@ func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
 	for i := range m.tiles {
 		tile := m.tiles[i]
 		imageToDraw := m.imageMap[tile.name]
-		isoPoint := objects.CartoToIso(tile.point)
+		isoPoint := geometry.CartoToIso(tile.point)
 
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
@@ -68,26 +68,26 @@ func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
 	}
 }
 
-func (m *GameMap) GetMapRectangle() objects.Rectangle {
+func (m *GameMap) GetMapRectangle() geometry.Rectangle {
 	p1, p2, p3, p4 := m.getMapCorners()
 	minX := math.Min(math.Min(p1.X(), p2.X()), math.Min(p3.X(), p4.X()))
 	maxX := math.Max(math.Max(p1.X(), p2.X()), math.Max(p3.X(), p4.X()))
 	minY := math.Min(math.Min(p1.Y(), p2.Y()), math.Min(p3.Y(), p4.Y()))
 	maxY := math.Max(math.Max(p1.Y(), p2.Y()), math.Max(p3.Y(), p4.Y()))
-	return objects.NewRectangle(maxX-minX, maxY-minY, minX, minY)
+	return geometry.NewRectangle(maxX-minX, maxY-minY, minX, minY)
 }
 
-func (m *GameMap) getMapCorners() (objects.Point, objects.Point, objects.Point, objects.Point) {
+func (m *GameMap) getMapCorners() (geometry.Point, geometry.Point, geometry.Point, geometry.Point) {
 	n := float64(m.tileNum)
 	tileIn := 2.0
 	minX := m.tileWidth * tileIn
 	minY := m.tileHeight * tileIn
 	maxX := m.tileWidth * (n - tileIn)
 	maxY := m.tileHeight * (n - tileIn)
-	p1 := objects.CartoToIso(objects.NewPoint(minX, minY))
-	p2 := objects.CartoToIso(objects.NewPoint(minX, maxY))
-	p3 := objects.CartoToIso(objects.NewPoint(maxX, minY))
-	p4 := objects.CartoToIso(objects.NewPoint(maxX, maxY))
+	p1 := geometry.CartoToIso(geometry.NewPoint(minX, minY))
+	p2 := geometry.CartoToIso(geometry.NewPoint(minX, maxY))
+	p3 := geometry.CartoToIso(geometry.NewPoint(maxX, minY))
+	p4 := geometry.CartoToIso(geometry.NewPoint(maxX, maxY))
 	return p1, p2, p3, p4
 }
 
