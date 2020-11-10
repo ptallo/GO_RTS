@@ -10,13 +10,16 @@ import (
 type Game struct {
 	gameMap *GameMap
 	camera  *render.Camera
+	unit    *Unit
 }
 
 func NewGame() Game {
 	cam := render.NewCamera()
+	unit := NewUnit()
 	return Game{
 		gameMap: NewMap(),
 		camera:  &cam,
+		unit:    &unit,
 	}
 }
 
@@ -27,6 +30,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.gameMap.DrawMap(g.camera, screen)
+	g.unit.DrawUnit(g.camera, screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
