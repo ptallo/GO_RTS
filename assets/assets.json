@@ -1,0 +1,62 @@
+{
+    "Units": [
+        {
+            "Name": "man",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "man2",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "man3",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "woman",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "woman2",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "woman3",
+            "Width": 96,
+            "Height": 192,
+            "FrameWidth": 32,
+            "FrameHeight": 64
+        }
+    ],
+    "Tiles": [
+        {
+            "Name": "grass",
+            "Width": 128,
+            "Height": 64,
+            "FrameWidth": 128,
+            "FrameHeight": 64
+        },
+        {
+            "Name": "water",
+            "Width": 128,
+            "Height": 64,
+            "FrameWidth": 128,
+            "FrameHeight": 64
+        }
+    ]
+}

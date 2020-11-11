@@ -26,3 +26,13 @@ func Test_GivenImageLibrary_WhenGivenNameNotInDict_ThenReturnsError(t *testing.T
 		t.Errorf("Should have returned error, key not in imageLibrary")
 	}
 }
+
+func Test_GivenJSONDescribingImageLib_ThenReturnsImageLib(t *testing.T) {
+	il := render.NewImageLibraryFromJSON("../assets/assets.json")
+
+	img, err := il.GetImage("man")
+
+	if img == nil || err != nil {
+		t.Errorf("Should have returned image library with a man, and no error")
+	}
+}

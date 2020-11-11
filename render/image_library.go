@@ -1,13 +1,28 @@
 package render
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type ImageLibrary struct {
 	stringToImageMap map[string]*ebiten.Image
+}
+
+type SpriteSheetDefinition struct {
+	Name        string
+	Width       int
+	Height      int
+	FrameWidth  int
+	FrameHeight int
+}
+
+type DefinitionLibrary struct {
+	Units []SpriteSheetDefinition
+	Tiles []SpriteSheetDefinition
 }
 
 func NewImageLibrary() ImageLibrary {
@@ -31,6 +46,25 @@ func NewImageLibraryFromPair(name string, img *ebiten.Image) ImageLibrary {
 	return ImageLibrary{
 		stringToImageMap: m,
 	}
+}
+
+func NewImageLibraryFromJSON(path string) ImageLibrary {
+	dat, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		panic(err)
+	}
+
+	var dl DefinitionLibrary
+	err = json.Unmarshal(dat, &dl)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: Create image lib from the definition library
+
+	return NewImageLibrary()
 }
 
 func (il *ImageLibrary) GetImage(name string) (*ebiten.Image, error) {
