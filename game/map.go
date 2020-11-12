@@ -53,19 +53,13 @@ func NewMap() GameMap {
 	}
 }
 
-func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image, imageLib *render.ImageLibrary) {
+func (m *GameMap) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {
 	for _, tile := range m.tiles {
-		imageToDraw, err := imageLib.GetImage(tile.name)
-
-		if err != nil {
-			panic(err)
-		}
-
 		isoPoint := geometry.CartoToIso(tile.point)
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
-
-		camera.DrawImage(screen, imageToDraw, opts)
+		spriteSheet := lib[tile.name]
+		spriteSheet.Draw(screen, camera, opts)
 	}
 }
 

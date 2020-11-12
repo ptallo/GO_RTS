@@ -8,27 +8,21 @@ import (
 )
 
 type Unit struct {
-	point      geometry.Point
-	spriteName string
+	point geometry.Point
+	name  string
 }
 
 func NewUnit() Unit {
 	return Unit{
-		point:      geometry.NewPoint(0.0, 0.0),
-		spriteName: "man",
+		point: geometry.NewPoint(0.0, 0.0),
+		name:  "man",
 	}
 }
 
-func (u *Unit) DrawUnit(camera *render.Camera, screen *ebiten.Image, imageLib *render.ImageLibrary) {
-	imageToDraw, err := imageLib.GetImage(u.spriteName)
-
-	if err != nil {
-		panic(err)
-	}
-
+func (u *Unit) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {
 	isoPoint := geometry.CartoToIso(u.point)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
-
-	camera.DrawImage(screen, imageToDraw, opts)
+	spriteSheet := lib[u.name]
+	spriteSheet.Draw(screen, camera, opts)
 }

@@ -8,23 +8,22 @@ import (
 )
 
 type Game struct {
-	camera       *render.Camera
-	imageLibrary *render.ImageLibrary
-	gameMap      *GameMap
-	unit         *Unit
+	camera         *render.Camera
+	spriteSheetLib map[string]*render.SpriteSheet
+	gameMap        *GameMap
+	unit           *Unit
 }
 
 func NewGame() Game {
 	cam := render.NewCamera()
-	il := render.NewImageLibrary()
 	gameMap := NewMap()
 	unit := NewUnit()
 
 	return Game{
-		camera:       &cam,
-		imageLibrary: &il,
-		gameMap:      &gameMap,
-		unit:         &unit,
+		camera:         &cam,
+		spriteSheetLib: render.NewSpriteSheetMap(),
+		gameMap:        &gameMap,
+		unit:           &unit,
 	}
 }
 
@@ -34,8 +33,8 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.gameMap.DrawMap(g.camera, screen, g.imageLibrary)
-	g.unit.DrawUnit(g.camera, screen, g.imageLibrary)
+	g.gameMap.Draw(g.camera, screen, g.spriteSheetLib)
+	g.unit.Draw(g.camera, screen, g.spriteSheetLib)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
