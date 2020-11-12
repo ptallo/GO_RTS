@@ -8,17 +8,17 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func NewImageFromPath(path string) *ebiten.Image {
+func NewImageFromPath(path string) (*ebiten.Image, error) {
 	reader, err := os.Open(path)
-	if err != nil {
-		panic(err)
-	}
 	defer reader.Close()
+	if err != nil {
+		return nil, err
+	}
 
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return ebiten.NewImageFromImage(img)
+	return ebiten.NewImageFromImage(img), nil
 }

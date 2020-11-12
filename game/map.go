@@ -9,7 +9,6 @@ import (
 
 type GameMap struct {
 	tiles      []*Tile
-	imageMap   map[string]*ebiten.Image
 	tileNum    int
 	tileWidth  float64
 	tileHeight float64
@@ -20,7 +19,7 @@ type Tile struct {
 	point geometry.Point
 }
 
-func NewMap() *GameMap {
+func NewMap() GameMap {
 	tiles := make([]*Tile, 0)
 	n := 10
 	tileW := 64.0
@@ -46,23 +45,21 @@ func NewMap() *GameMap {
 		}
 	}
 
-	return &GameMap{
+	return GameMap{
 		tiles:      tiles,
-		imageMap:   newTileNameToImageMap(),
 		tileNum:    n,
 		tileWidth:  tileW,
 		tileHeight: tileH,
 	}
 }
 
-func (m *GameMap) DrawMap(camera *render.Camera, screen *ebiten.Image) {
+func (m *GameMap) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {
 	for _, tile := range m.tiles {
-		imageToDraw := m.imageMap[tile.name]
 		isoPoint := geometry.CartoToIso(tile.point)
-
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
-		camera.DrawImage(screen, imageToDraw, opts)
+		spriteSheet := lib[tile.name]
+		spriteSheet.Draw(screen, camera, opts)
 	}
 }
 
@@ -88,11 +85,4 @@ func (m *GameMap) getTileCorners(i, j float64) []geometry.Point {
 		geometry.CartoToIso(geometry.NewPoint((i+1)*w, (j+1)*h)),
 	}
 	return points
-}
-
-func newTileNameToImageMap() map[string]*ebiten.Image {
-	return map[string]*ebiten.Image{
-		"grass": render.NewImageFromPath("./assets/tiles/grass.png"),
-		"water": render.NewImageFromPath("./assets/tiles/water.png"),
-	}
 }
