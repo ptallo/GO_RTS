@@ -14,11 +14,13 @@ func NewSpriteSheetMap() map[string]*SpriteSheet {
 	woman, _ := NewSpriteSheet("units", "woman")
 	grass, _ := NewSpriteSheet("tiles", "grass")
 	water, _ := NewSpriteSheet("tiles", "water")
+	mouse, _ := NewSpriteSheet("ui", "mouse")
 	return map[string]*SpriteSheet{
 		"man":   &man,
 		"woman": &woman,
 		"grass": &grass,
 		"water": &water,
+		"mouse": &mouse,
 	}
 }
 

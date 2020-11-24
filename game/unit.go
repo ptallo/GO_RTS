@@ -12,11 +12,12 @@ type Unit struct {
 	name  string
 }
 
-func NewUnit() Unit {
-	return Unit{
+func NewUnit() *Unit {
+	u := Unit{
 		point: geometry.NewPoint(0.0, 0.0),
 		name:  "man",
 	}
+	return &u
 }
 
 func (u *Unit) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {

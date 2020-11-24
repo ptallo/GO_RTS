@@ -19,7 +19,7 @@ type Tile struct {
 	point geometry.Point
 }
 
-func NewMap() GameMap {
+func NewMap() *GameMap {
 	tiles := make([]*Tile, 0)
 	n := 10
 	tileW := 64.0
@@ -45,12 +45,13 @@ func NewMap() GameMap {
 		}
 	}
 
-	return GameMap{
+	gm := GameMap{
 		tiles:      tiles,
 		tileNum:    n,
 		tileWidth:  tileW,
 		tileHeight: tileH,
 	}
+	return &gm
 }
 
 func (m *GameMap) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {

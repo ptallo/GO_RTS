@@ -2,6 +2,7 @@ package geometry
 
 import (
 	"fmt"
+	"math"
 )
 
 type Rectangle struct {
@@ -17,6 +18,27 @@ func NewRectangle(w, h, x, y float64) Rectangle {
 		height: h,
 		point:  &p,
 	}
+}
+
+func NewRectangleFromPoints(p1, p2 Point) Rectangle {
+	x := math.Min(p1.x, p2.x)
+	x2 := math.Max(p1.x, p2.x)
+	y := math.Min(p1.y, p2.y)
+	y2 := math.Max(p1.y, p2.y)
+
+	return NewRectangle(x2-x, y2-y, x, y)
+}
+
+func (r Rectangle) Point() *Point {
+	return r.point
+}
+
+func (r Rectangle) Width() float64 {
+	return r.width
+}
+
+func (r Rectangle) Height() float64 {
+	return r.height
 }
 
 func (r Rectangle) Move(x, y float64) {

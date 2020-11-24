@@ -11,11 +11,12 @@ type Camera struct {
 	speed       float64
 }
 
-func NewCamera() Camera {
-	return Camera{
+func NewCamera() *Camera {
+	c := Camera{
 		translation: geometry.NewPoint(0, 0),
 		speed:       5.0,
 	}
+	return &c
 }
 
 func (c *Camera) Translation() geometry.Point {
@@ -35,20 +36,25 @@ func (c *Camera) MoveCamera(p geometry.Point) {
 	c.translation.Move(p)
 }
 
-func (c *Camera) UpdateCameraPosition() {
+func (c *Camera) GetCameraMovements() []geometry.Point {
 	width, height := ebiten.WindowSize()
+
 	cursorX, cursorY := ebiten.CursorPosition()
 	p := geometry.NewPoint(float64(cursorX), float64(cursorY))
+
+	moves := make([]geometry.Point, 0)
 	if p.X() < float64(width)*0.1 {
-		c.MoveCamera(geometry.NewPoint(c.speed, 0))
+		moves = append(moves, geometry.NewPoint(-c.Speed(), 0))
 	}
 	if p.X() > float64(width)*0.9 {
-		c.MoveCamera(geometry.NewPoint(-c.speed, 0))
+		moves = append(moves, geometry.NewPoint(c.Speed(), 0))
 	}
 	if p.Y() < float64(height)*0.1 {
-		c.MoveCamera(geometry.NewPoint(0, c.speed))
+		moves = append(moves, geometry.NewPoint(0, -c.Speed()))
 	}
 	if p.Y() > float64(height)*0.9 {
-		c.MoveCamera(geometry.NewPoint(0, -c.speed))
+		moves = append(moves, geometry.NewPoint(0, c.Speed()))
 	}
+
+	return moves
 }
