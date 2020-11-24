@@ -3,6 +3,7 @@ package game
 import (
 	"go_rts/geometry"
 	"go_rts/render"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -13,11 +14,10 @@ type Mouse struct {
 	spriteSheet            *render.SpriteSheet
 }
 
-func NewMouse(ss *render.SpriteSheet) *Mouse {
+func NewMouse() *Mouse {
 	m := Mouse{
 		leftButtonDownDuration: 0,
 		leftButtonDownPoint:    geometry.NewPoint(0, 0),
-		spriteSheet:            ss,
 	}
 	return &m
 }
@@ -66,15 +66,23 @@ func (m *Mouse) position() geometry.Point {
 }
 
 func (m *Mouse) getMouseDrawOptions(mouseRect geometry.Rectangle) *ebiten.DrawImageOptions {
-	xScale := mouseRect.Width() / float64(m.spriteSheet.Definition.FrameWidth)
-	yScale := mouseRect.Height() / float64(m.spriteSheet.Definition.FrameHeight)
-
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Scale(xScale, yScale)
 	opts.GeoM.Translate(mouseRect.Point().X(), mouseRect.Point().Y())
 	return opts
 }
 
 func (m *Mouse) getMouseImage(width, height int) *ebiten.Image {
-	return m.spriteSheet.Image
+	img := ebiten.NewImage(width, height)
+	for i := 0; i < width; i++ {
+		for j := 0; j < height; j++ {
+			if isCloseToEdge(i, width) || isCloseToEdge(j, height) {
+				img.Set(i, j, color.White)
+			}
+		}
+	}
+	return img
+}
+
+func isCloseToEdge(i, j int) bool {
+	return i == 0 || i == 1 || i == j-1 || i == j-2
 }

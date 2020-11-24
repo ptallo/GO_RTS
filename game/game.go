@@ -20,7 +20,7 @@ func NewGame() Game {
 	return Game{
 		camera:         render.NewCamera(),
 		spriteSheetLib: ssl,
-		mouse:          NewMouse(ssl["mouse"]),
+		mouse:          NewMouse(),
 		gameMap:        NewMap(),
 		unit:           NewUnit(),
 	}
