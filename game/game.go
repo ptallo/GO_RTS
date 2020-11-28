@@ -2,39 +2,39 @@ package game
 
 import (
 	"go_rts/geometry"
-	"go_rts/render"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	camera         *render.Camera
-	spriteSheetLib map[string]*render.SpriteSheet
-	gameMap        *GameMap
-	unit           *Unit
+	container *Container
+	mouse     *Mouse
+	gameMap   *GameMap
+	units     []*Unit
 }
 
 func NewGame() Game {
-	cam := render.NewCamera()
-	gameMap := NewMap()
-	unit := NewUnit()
-
+	c := &Container{}
 	return Game{
-		camera:         &cam,
-		spriteSheetLib: render.NewSpriteSheetMap(),
-		gameMap:        &gameMap,
-		unit:           &unit,
+		container: c,
+		mouse:     NewMouse(c.GetCamera()),
+		gameMap:   NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		units:     []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
 	}
 }
 
 func (g *Game) Update() error {
 	g.updateCameraPosition()
+	g.mouse.Update(g.units)
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.gameMap.Draw(g.camera, screen, g.spriteSheetLib)
-	g.unit.Draw(g.camera, screen, g.spriteSheetLib)
+	g.gameMap.Draw(screen)
+	for _, unit := range g.units {
+		unit.Draw(screen)
+	}
+	g.mouse.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -42,43 +42,23 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) updateCameraPosition() {
-	width, height := ebiten.WindowSize()
-
-	cursorX, cursorY := ebiten.CursorPosition()
-	p := geometry.NewPoint(float64(cursorX), float64(cursorY))
-
-	moves := make([]geometry.Point, 0)
-	if p.X() < float64(width)*0.1 {
-		moves = append(moves, geometry.NewPoint(-g.camera.Speed(), 0))
-	}
-	if p.X() > float64(width)*0.9 {
-		moves = append(moves, geometry.NewPoint(g.camera.Speed(), 0))
-	}
-	if p.Y() < float64(height)*0.1 {
-		moves = append(moves, geometry.NewPoint(0, -g.camera.Speed()))
-	}
-	if p.Y() > float64(height)*0.9 {
-		moves = append(moves, geometry.NewPoint(0, g.camera.Speed()))
-	}
-
+	moves := g.container.GetCamera().GetCameraMovements()
 	for _, move := range moves {
-		g.camera.MoveCamera(move)
+		g.container.GetCamera().MoveCamera(move)
 	}
 
-	if !g.isScreenAndMapOverlapping() {
+	mapPoints := g.gameMap.getMapPoints(1.0)
+	if !g.doesScreenContainAPoint(mapPoints...) {
 		for _, move := range moves {
-			g.camera.MoveCamera(move.Inverse())
+			g.container.GetCamera().MoveCamera(move.Inverse())
 		}
 	}
 }
 
-func (g *Game) isScreenAndMapOverlapping() bool {
-	// Get the rectangle describing the screen
+func (g *Game) doesScreenContainAPoint(points ...geometry.Point) bool {
 	width, height := ebiten.WindowSize()
-	screenOrigin := g.camera.Translation()
+	screenOrigin := g.container.GetCamera().Translation()
 	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X(), screenOrigin.Y())
-
-	points := g.gameMap.getMapPoints(1.0)
 
 	for _, p := range points {
 		if screenRect.Contains(p) {

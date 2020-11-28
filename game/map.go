@@ -8,6 +8,8 @@ import (
 )
 
 type GameMap struct {
+	ssl        *render.SpriteSheetLibrary
+	camera     *render.Camera
 	tiles      []*Tile
 	tileNum    int
 	tileWidth  float64
@@ -19,7 +21,7 @@ type Tile struct {
 	point geometry.Point
 }
 
-func NewMap() GameMap {
+func NewMap(ssl *render.SpriteSheetLibrary, camera *render.Camera) *GameMap {
 	tiles := make([]*Tile, 0)
 	n := 10
 	tileW := 64.0
@@ -45,21 +47,24 @@ func NewMap() GameMap {
 		}
 	}
 
-	return GameMap{
+	gm := GameMap{
+		ssl:        ssl,
+		camera:     camera,
 		tiles:      tiles,
 		tileNum:    n,
 		tileWidth:  tileW,
 		tileHeight: tileH,
 	}
+	return &gm
 }
 
-func (m *GameMap) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {
+func (m *GameMap) Draw(screen *ebiten.Image) {
 	for _, tile := range m.tiles {
 		isoPoint := geometry.CartoToIso(tile.point)
 		opts := &ebiten.DrawImageOptions{}
 		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
-		spriteSheet := lib[tile.name]
-		spriteSheet.Draw(screen, camera, opts)
+		spriteSheet := m.ssl.GetSpriteSheet(tile.name)
+		spriteSheet.Draw(screen, m.camera, opts)
 	}
 }
 
