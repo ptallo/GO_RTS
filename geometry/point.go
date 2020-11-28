@@ -20,7 +20,7 @@ func (p Point) Y() float64 {
 	return p.y
 }
 
-func (p *Point) Move(point Point) {
+func (p *Point) Translate(point Point) {
 	p.x += point.x
 	p.y += point.y
 }

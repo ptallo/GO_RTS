@@ -2,39 +2,38 @@ package game
 
 import (
 	"go_rts/geometry"
-	"go_rts/render"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	camera         *render.Camera
-	spriteSheetLib map[string]*render.SpriteSheet
-	mouse          *Mouse
-	gameMap        *GameMap
-	unit           *Unit
+	container *Container
+	mouse     *Mouse
+	gameMap   *GameMap
+	units     []*Unit
 }
 
 func NewGame() Game {
-	ssl := render.NewSpriteSheetMap()
+	c := &Container{}
 	return Game{
-		camera:         render.NewCamera(),
-		spriteSheetLib: ssl,
-		mouse:          NewMouse(),
-		gameMap:        NewMap(),
-		unit:           NewUnit(),
+		container: c,
+		mouse:     NewMouse(c.GetCamera()),
+		gameMap:   NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		units:     []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
 	}
 }
 
 func (g *Game) Update() error {
 	g.updateCameraPosition()
-	g.mouse.Update()
+	g.mouse.Update(g.units)
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.gameMap.Draw(g.camera, screen, g.spriteSheetLib)
-	g.unit.Draw(g.camera, screen, g.spriteSheetLib)
+	g.gameMap.Draw(screen)
+	for _, unit := range g.units {
+		unit.Draw(screen)
+	}
 	g.mouse.Draw(screen)
 }
 
@@ -43,22 +42,22 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) updateCameraPosition() {
-	moves := g.camera.GetCameraMovements()
+	moves := g.container.GetCamera().GetCameraMovements()
 	for _, move := range moves {
-		g.camera.MoveCamera(move)
+		g.container.GetCamera().MoveCamera(move)
 	}
 
 	mapPoints := g.gameMap.getMapPoints(1.0)
 	if !g.doesScreenContainAPoint(mapPoints...) {
 		for _, move := range moves {
-			g.camera.MoveCamera(move.Inverse())
+			g.container.GetCamera().MoveCamera(move.Inverse())
 		}
 	}
 }
 
 func (g *Game) doesScreenContainAPoint(points ...geometry.Point) bool {
 	width, height := ebiten.WindowSize()
-	screenOrigin := g.camera.Translation()
+	screenOrigin := g.container.GetCamera().Translation()
 	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X(), screenOrigin.Y())
 
 	for _, p := range points {

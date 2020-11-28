@@ -41,8 +41,8 @@ func (r Rectangle) Height() float64 {
 	return r.height
 }
 
-func (r Rectangle) Move(x, y float64) {
-	r.point.Move(NewPoint(x, y))
+func (r Rectangle) Translate(p Point) {
+	r.point.Translate(p)
 }
 
 func (r1 Rectangle) Intersects(r2 Rectangle) bool {

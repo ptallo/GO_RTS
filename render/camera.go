@@ -11,12 +11,11 @@ type Camera struct {
 	speed       float64
 }
 
-func NewCamera() *Camera {
-	c := Camera{
-		translation: geometry.NewPoint(0, 0),
-		speed:       5.0,
+func NewCamera(t geometry.Point, s float64) *Camera {
+	return &Camera{
+		translation: t,
+		speed:       s,
 	}
-	return &c
 }
 
 func (c *Camera) Translation() geometry.Point {
@@ -33,7 +32,7 @@ func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOpti
 }
 
 func (c *Camera) MoveCamera(p geometry.Point) {
-	c.translation.Move(p)
+	c.translation.Translate(p)
 }
 
 func (c *Camera) GetCameraMovements() []geometry.Point {

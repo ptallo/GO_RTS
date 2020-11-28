@@ -8,22 +8,37 @@ import (
 )
 
 type Unit struct {
-	point geometry.Point
-	name  string
+	spriteSheetLibrary *render.SpriteSheetLibrary
+	camera             *render.Camera
+	point              geometry.Point
+	name               string
 }
 
-func NewUnit() *Unit {
+func NewUnit(ssl *render.SpriteSheetLibrary, camera *render.Camera) *Unit {
 	u := Unit{
-		point: geometry.NewPoint(0.0, 0.0),
-		name:  "man",
+		spriteSheetLibrary: ssl,
+		camera:             camera,
+		point:              geometry.NewPoint(0.0, 0.0),
+		name:               "man",
 	}
 	return &u
 }
 
-func (u *Unit) Draw(camera *render.Camera, screen *ebiten.Image, lib map[string]*render.SpriteSheet) {
+func (u *Unit) Draw(screen *ebiten.Image) {
 	isoPoint := geometry.CartoToIso(u.point)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
-	spriteSheet := lib[u.name]
-	spriteSheet.Draw(screen, camera, opts)
+	ss := u.spriteSheetLibrary.GetSpriteSheet(u.name)
+	ss.Draw(screen, u.camera, opts)
+}
+
+func (u *Unit) GetDrawRectangle() geometry.Rectangle {
+	isoPoint := geometry.CartoToIso(u.point)
+	ss := u.spriteSheetLibrary.GetSpriteSheet(u.name)
+	return geometry.NewRectangle(
+		float64(ss.Definition.FrameWidth),
+		float64(ss.Definition.FrameHeight),
+		isoPoint.X(),
+		isoPoint.Y(),
+	)
 }
