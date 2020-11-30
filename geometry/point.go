@@ -1,48 +1,40 @@
 package geometry
 
 type Point struct {
-	x float64
-	y float64
+	X float64
+	Y float64
 }
 
 func NewPoint(newX, newY float64) Point {
 	return Point{
-		x: newX,
-		y: newY,
+		X: newX,
+		Y: newY,
 	}
 }
 
-func (p Point) X() float64 {
-	return p.x
-}
-
-func (p Point) Y() float64 {
-	return p.y
-}
-
 func (p *Point) Translate(point Point) {
-	p.x += point.x
-	p.y += point.y
+	p.X += point.X
+	p.Y += point.Y
 }
 
 func (p Point) Inverse() Point {
-	return NewPoint(-p.x, -p.y)
+	return NewPoint(-p.X, -p.Y)
 }
 
 func (p1 Point) Equals(p2 Point) bool {
-	return p1.x == p2.x && p1.y == p2.y
+	return p1.X == p2.X && p1.Y == p2.Y
 }
 
 func CartoToIso(p Point) Point {
 	return Point{
-		x: p.x - p.y,
-		y: (p.x + p.y) / 2,
+		X: p.X - p.Y,
+		Y: (p.X + p.Y) / 2,
 	}
 }
 
 func IsoToCarto(p Point) Point {
 	return Point{
-		x: (2*p.y + p.x) / 2,
-		y: (2*p.y - p.x) / 2,
+		X: (2*p.Y + p.X) / 2,
+		Y: (2*p.Y - p.X) / 2,
 	}
 }

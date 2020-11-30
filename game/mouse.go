@@ -46,7 +46,7 @@ func (m *Mouse) Update(units []*Unit) []*Unit {
 func (m *Mouse) selectUnits(units []*Unit) []*Unit {
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
-		cameraTranslation := m.camera.Translation()
+		cameraTranslation := m.camera.Translation
 		unitIsoRect := unit.GetDrawRectangle()
 		unitIsoRect.Translate(cameraTranslation.Inverse())
 		if m.getMouseSelectionRect().Intersects(unitIsoRect) {
@@ -68,7 +68,7 @@ func (m *Mouse) Draw(screen *ebiten.Image) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		rect := m.getMouseSelectionRect()
 		opts := m.getMouseDrawOptions(rect)
-		img := getMouseImage(int(rect.Width()), int(rect.Height()))
+		img := getMouseImage(int(rect.Width), int(rect.Height))
 		screen.DrawImage(img, opts)
 	} else {
 	}
@@ -85,7 +85,7 @@ func (m *Mouse) position() geometry.Point {
 
 func (m *Mouse) getMouseDrawOptions(mouseRect geometry.Rectangle) *ebiten.DrawImageOptions {
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(mouseRect.Point().X(), mouseRect.Point().Y())
+	opts.GeoM.Translate(mouseRect.Point.X, mouseRect.Point.Y)
 	return opts
 }
 

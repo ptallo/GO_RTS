@@ -6,59 +6,47 @@ import (
 )
 
 type Rectangle struct {
-	width  float64
-	height float64
-	point  *Point
+	Width  float64
+	Height float64
+	Point  *Point
 }
 
 func NewRectangle(w, h, x, y float64) Rectangle {
 	p := NewPoint(x, y)
 	return Rectangle{
-		width:  w,
-		height: h,
-		point:  &p,
+		Width:  w,
+		Height: h,
+		Point:  &p,
 	}
 }
 
 func NewRectangleFromPoints(p1, p2 Point) Rectangle {
-	x := math.Min(p1.x, p2.x)
-	x2 := math.Max(p1.x, p2.x)
-	y := math.Min(p1.y, p2.y)
-	y2 := math.Max(p1.y, p2.y)
+	x := math.Min(p1.X, p2.X)
+	x2 := math.Max(p1.X, p2.X)
+	y := math.Min(p1.Y, p2.Y)
+	y2 := math.Max(p1.Y, p2.Y)
 
 	return NewRectangle(x2-x, y2-y, x, y)
 }
 
-func (r Rectangle) Point() *Point {
-	return r.point
-}
-
-func (r Rectangle) Width() float64 {
-	return r.width
-}
-
-func (r Rectangle) Height() float64 {
-	return r.height
-}
-
 func (r Rectangle) Translate(p Point) {
-	r.point.Translate(p)
+	r.Point.Translate(p)
 }
 
 func (r1 Rectangle) Intersects(r2 Rectangle) bool {
-	if r1.point.x >= r2.point.x+r2.width || r2.point.x >= r1.point.x+r1.width {
+	if r1.Point.X >= r2.Point.X+r2.Width || r2.Point.X >= r1.Point.X+r1.Width {
 		return false
 	}
-	if r1.point.y >= r2.point.y+r2.height || r2.point.y >= r1.point.y+r1.height {
+	if r1.Point.Y >= r2.Point.Y+r2.Height || r2.Point.Y >= r1.Point.Y+r1.Height {
 		return false
 	}
 	return true
 }
 
 func (r Rectangle) Contains(p Point) bool {
-	return r.point.x <= p.x && r.point.x+r.width >= p.x && r.point.y <= p.y && r.point.y+r.height >= p.y
+	return r.Point.X <= p.X && r.Point.X+r.Width >= p.X && r.Point.Y <= p.Y && r.Point.Y+r.Height >= p.Y
 }
 
 func (r Rectangle) ToString() string {
-	return fmt.Sprintf("%g %g %v", r.width, r.height, r.point)
+	return fmt.Sprintf("%g %g %v", r.Width, r.Height, r.Point)
 }

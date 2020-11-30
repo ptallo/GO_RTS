@@ -57,8 +57,8 @@ func (g *Game) updateCameraPosition() {
 
 func (g *Game) doesScreenContainAPoint(points ...geometry.Point) bool {
 	width, height := ebiten.WindowSize()
-	screenOrigin := g.container.GetCamera().Translation()
-	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X(), screenOrigin.Y())
+	screenOrigin := g.container.GetCamera().Translation
+	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X, screenOrigin.Y)
 
 	for _, p := range points {
 		if screenRect.Contains(p) {

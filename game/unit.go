@@ -27,7 +27,7 @@ func NewUnit(ssl *render.SpriteSheetLibrary, camera *render.Camera) *Unit {
 func (u *Unit) Draw(screen *ebiten.Image) {
 	isoPoint := geometry.CartoToIso(u.point)
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
+	opts.GeoM.Translate(isoPoint.X, isoPoint.Y)
 	ss := u.spriteSheetLibrary.GetSpriteSheet(u.name)
 	ss.Draw(screen, u.camera, opts)
 }
@@ -38,7 +38,7 @@ func (u *Unit) GetDrawRectangle() geometry.Rectangle {
 	return geometry.NewRectangle(
 		float64(ss.Definition.FrameWidth),
 		float64(ss.Definition.FrameHeight),
-		isoPoint.X(),
-		isoPoint.Y(),
+		isoPoint.X,
+		isoPoint.Y,
 	)
 }

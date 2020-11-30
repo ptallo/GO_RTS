@@ -62,7 +62,7 @@ func (m *GameMap) Draw(screen *ebiten.Image) {
 	for _, tile := range m.tiles {
 		isoPoint := geometry.CartoToIso(tile.point)
 		opts := &ebiten.DrawImageOptions{}
-		opts.GeoM.Translate(isoPoint.X(), isoPoint.Y())
+		opts.GeoM.Translate(isoPoint.X, isoPoint.Y)
 		spriteSheet := m.ssl.GetSpriteSheet(tile.name)
 		spriteSheet.Draw(screen, m.camera, opts)
 	}
