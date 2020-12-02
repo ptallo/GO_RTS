@@ -6,11 +6,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Camera is an object used to track how the screen has moved in a game
 type Camera struct {
 	Translation geometry.Point
 	Speed       float64
 }
 
+// NewCamera is a shortcut to creating a Camera object
 func NewCamera(t geometry.Point, s float64) *Camera {
 	return &Camera{
 		Translation: t,
@@ -18,15 +20,19 @@ func NewCamera(t geometry.Point, s float64) *Camera {
 	}
 }
 
+// DrawImage draws an image on a screen adjusted for the cameras translation
 func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOptions) {
-	opts.GeoM.Translate(-c.Translation.X, -c.Translation.Y)
+	inv := c.Translation.Inverse()
+	opts.GeoM.Translate(inv.X, inv.Y)
 	screen.DrawImage(img, opts)
 }
 
+// MoveCamera is a forwarding mechanism to translate the cameras current translation
 func (c *Camera) MoveCamera(p geometry.Point) {
 	c.Translation.Translate(p)
 }
 
+// GetCameraMovements will return how the camera should move given the current position of a mouse in relation to the window
 func (c *Camera) GetCameraMovements() []geometry.Point {
 	width, height := ebiten.WindowSize()
 

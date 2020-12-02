@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Game an implementation of the interface provided by the ebiten v2 library
 type Game struct {
 	container *Container
 	mouse     *Mouse
@@ -13,6 +14,7 @@ type Game struct {
 	units     []*Unit
 }
 
+// NewGame a shorcut method to instantiate a game object
 func NewGame() Game {
 	c := &Container{}
 	return Game{
@@ -23,12 +25,14 @@ func NewGame() Game {
 	}
 }
 
+// Update is used to update all the game logic
 func (g *Game) Update() error {
 	g.updateCameraPosition()
 	g.mouse.Update(g.units)
 	return nil
 }
 
+// Draw is used to draw any relevant images on the screen
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.gameMap.Draw(screen)
 	for _, unit := range g.units {
@@ -37,6 +41,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.mouse.Draw(screen)
 }
 
+// Layout returns the layout of the screen
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return outsideWidth, outsideHeight
 }

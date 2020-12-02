@@ -5,12 +5,14 @@ import (
 	"math"
 )
 
+// Rectangle is defined given its top-left point and the width and height
 type Rectangle struct {
 	Width  float64
 	Height float64
 	Point  *Point
 }
 
+// NewRectangle is a shortcut to define a new rectangle
 func NewRectangle(w, h, x, y float64) Rectangle {
 	p := NewPoint(x, y)
 	return Rectangle{
@@ -20,6 +22,7 @@ func NewRectangle(w, h, x, y float64) Rectangle {
 	}
 }
 
+// NewRectangleFromPoints is a shortcut to define a new Rectangle given two points
 func NewRectangleFromPoints(p1, p2 Point) Rectangle {
 	x := math.Min(p1.X, p2.X)
 	x2 := math.Max(p1.X, p2.X)
@@ -29,24 +32,23 @@ func NewRectangleFromPoints(p1, p2 Point) Rectangle {
 	return NewRectangle(x2-x, y2-y, x, y)
 }
 
-func (r Rectangle) Translate(p Point) {
-	r.Point.Translate(p)
-}
-
-func (r1 Rectangle) Intersects(r2 Rectangle) bool {
-	if r1.Point.X >= r2.Point.X+r2.Width || r2.Point.X >= r1.Point.X+r1.Width {
+// Intersects checks if one rectangle intersects another rectangle
+func (r Rectangle) Intersects(r2 Rectangle) bool {
+	if r.Point.X >= r2.Point.X+r2.Width || r2.Point.X >= r.Point.X+r.Width {
 		return false
 	}
-	if r1.Point.Y >= r2.Point.Y+r2.Height || r2.Point.Y >= r1.Point.Y+r1.Height {
+	if r.Point.Y >= r2.Point.Y+r2.Height || r2.Point.Y >= r.Point.Y+r.Height {
 		return false
 	}
 	return true
 }
 
+// Contains checks to see if a rectangle contains a point
 func (r Rectangle) Contains(p Point) bool {
 	return r.Point.X <= p.X && r.Point.X+r.Width >= p.X && r.Point.Y <= p.Y && r.Point.Y+r.Height >= p.Y
 }
 
+// ToString prints a rectangle to a string in a nice way
 func (r Rectangle) ToString() string {
 	return fmt.Sprintf("%g %g %v", r.Width, r.Height, r.Point)
 }

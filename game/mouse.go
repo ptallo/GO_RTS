@@ -9,21 +9,23 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Mouse is an object wrapping all ebiten mouse utilities
 type Mouse struct {
 	camera                 *render.Camera
 	leftButtonDownDuration int
 	leftButtonDownPoint    geometry.Point
 }
 
+// NewMouse is shorcut method to defining a Mouse object
 func NewMouse(camera *render.Camera) *Mouse {
-	m := Mouse{
+	return &Mouse{
 		camera:                 camera,
 		leftButtonDownDuration: 0,
 		leftButtonDownPoint:    geometry.NewPoint(0, 0),
 	}
-	return &m
 }
 
+// Update is responsible for firing events related to the mouse object
 func (m *Mouse) Update(units []*Unit) []*Unit {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		m.leftButtonDownDuration++
@@ -48,7 +50,7 @@ func (m *Mouse) selectUnits(units []*Unit) []*Unit {
 	for _, unit := range units {
 		cameraTranslation := m.camera.Translation
 		unitIsoRect := unit.GetDrawRectangle()
-		unitIsoRect.Translate(cameraTranslation.Inverse())
+		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
 		if m.getMouseSelectionRect().Intersects(unitIsoRect) {
 			selectedUnits = append(selectedUnits, unit)
 		}
@@ -64,6 +66,7 @@ func (m Mouse) isLeftButtonPressed() bool {
 	return m.leftButtonDownDuration != 0
 }
 
+// Draw is responsible for drawing any mouse related effects on the screen
 func (m *Mouse) Draw(screen *ebiten.Image) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		rect := m.getMouseSelectionRect()

@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Unit is an object describing a game unit
 type Unit struct {
 	spriteSheetLibrary *render.SpriteSheetLibrary
 	camera             *render.Camera
@@ -14,6 +15,7 @@ type Unit struct {
 	name               string
 }
 
+// NewUnit is a shorcut for creating a NewUnit
 func NewUnit(ssl *render.SpriteSheetLibrary, camera *render.Camera) *Unit {
 	u := Unit{
 		spriteSheetLibrary: ssl,
@@ -24,6 +26,7 @@ func NewUnit(ssl *render.SpriteSheetLibrary, camera *render.Camera) *Unit {
 	return &u
 }
 
+// Draw is responsible for drawing a game unit on a screen
 func (u *Unit) Draw(screen *ebiten.Image) {
 	isoPoint := geometry.CartoToIso(u.point)
 	opts := &ebiten.DrawImageOptions{}
@@ -32,6 +35,7 @@ func (u *Unit) Draw(screen *ebiten.Image) {
 	ss.Draw(screen, u.camera, opts)
 }
 
+// GetDrawRectangle returns the rectangle of a unit in isometric space
 func (u *Unit) GetDrawRectangle() geometry.Rectangle {
 	isoPoint := geometry.CartoToIso(u.point)
 	ss := u.spriteSheetLibrary.GetSpriteSheet(u.name)

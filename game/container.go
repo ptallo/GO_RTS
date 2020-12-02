@@ -5,11 +5,13 @@ import (
 	"go_rts/render"
 )
 
+// Container is an object which holds objects for the game
 type Container struct {
 	spriteSheetLibrary *render.SpriteSheetLibrary
 	camera             *render.Camera
 }
 
+// GetSpriteSheetLibrary will lazy-load a singleton SpriteSheetLibrary object
 func (c *Container) GetSpriteSheetLibrary() *render.SpriteSheetLibrary {
 	if c.spriteSheetLibrary == nil {
 		man, _ := render.NewSpriteSheet("units", "man")
@@ -30,6 +32,7 @@ func (c *Container) GetSpriteSheetLibrary() *render.SpriteSheetLibrary {
 	return c.spriteSheetLibrary
 }
 
+// GetCamera will lazy-load a singleton camera object
 func (c *Container) GetCamera() *render.Camera {
 	if c.camera == nil {
 		c.camera = render.NewCamera(

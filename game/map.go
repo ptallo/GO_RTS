@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// GameMap is a container for drawing a gameMap
 type GameMap struct {
 	ssl        *render.SpriteSheetLibrary
 	camera     *render.Camera
@@ -16,11 +17,13 @@ type GameMap struct {
 	tileHeight float64
 }
 
+// Tile is an object describing a map tile
 type Tile struct {
 	name  string
 	point geometry.Point
 }
 
+// NewMap is a shorcut for defining a GameMap object
 func NewMap(ssl *render.SpriteSheetLibrary, camera *render.Camera) *GameMap {
 	tiles := make([]*Tile, 0)
 	n := 10
@@ -58,6 +61,7 @@ func NewMap(ssl *render.SpriteSheetLibrary, camera *render.Camera) *GameMap {
 	return &gm
 }
 
+// Draw will draw the map on a given screen
 func (m *GameMap) Draw(screen *ebiten.Image) {
 	for _, tile := range m.tiles {
 		isoPoint := geometry.CartoToIso(tile.point)
