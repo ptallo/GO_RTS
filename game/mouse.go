@@ -27,22 +27,37 @@ func NewMouse(camera *render.Camera) *Mouse {
 
 // Update is responsible for firing events related to the mouse object
 func (m *Mouse) Update(units []*Unit) []*Unit {
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		m.leftButtonDownDuration++
-		if m.leftButtonDownDuration == 1 {
-			m.leftButtonDownPoint = m.position()
-		}
-	} else {
-		selectedUnits := make([]*Unit, 0)
-		if m.leftButtonDownDuration != 0 {
-			selectedUnits = m.selectUnits(units)
-			fmt.Printf("selected units length: %v\n", len(selectedUnits))
-		}
-		m.leftButtonDownDuration = 0
-		return selectedUnits
+	// Call any event checking here
+	if m.isLeftButtonJustPressed() {
+		m.leftButtonDownPoint = m.position()
 	}
 
-	return []*Unit{}
+	selectedUnits := make([]*Unit, 0)
+	if m.isMouseButtonJustReleased() {
+		selectedUnits = m.selectUnits(units)
+		fmt.Printf("selected units length: %v\n", len(selectedUnits))
+	}
+
+	// Then update the Button down durations
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		m.leftButtonDownDuration++
+	} else {
+		m.leftButtonDownDuration = 0
+	}
+
+	return selectedUnits
+}
+
+func (m *Mouse) isMouseButtonJustReleased() bool {
+	return !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration != 0
+}
+
+func (m Mouse) isLeftButtonJustPressed() bool {
+	return ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration == 0
+}
+
+func (m Mouse) isLeftButtonPressed() bool {
+	return m.leftButtonDownDuration != 0
 }
 
 func (m *Mouse) selectUnits(units []*Unit) []*Unit {
@@ -58,14 +73,6 @@ func (m *Mouse) selectUnits(units []*Unit) []*Unit {
 	return selectedUnits
 }
 
-func (m Mouse) isLeftButtonJustPressed() bool {
-	return m.leftButtonDownDuration == 1
-}
-
-func (m Mouse) isLeftButtonPressed() bool {
-	return m.leftButtonDownDuration != 0
-}
-
 // Draw is responsible for drawing any mouse related effects on the screen
 func (m *Mouse) Draw(screen *ebiten.Image) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
@@ -73,7 +80,6 @@ func (m *Mouse) Draw(screen *ebiten.Image) {
 		opts := m.getMouseDrawOptions(rect)
 		img := getMouseImage(int(rect.Width), int(rect.Height))
 		screen.DrawImage(img, opts)
-	} else {
 	}
 }
 
