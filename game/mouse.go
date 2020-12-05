@@ -1,69 +1,62 @@
 package game
 
 import (
-	"fmt"
 	"go_rts/geometry"
-	"go_rts/render"
 	"image/color"
 
+	"github.com/ethereum/go-ethereum/event"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Mouse is an object wrapping all ebiten mouse utilities
 type Mouse struct {
-	camera                 *render.Camera
-	leftButtonDownDuration int
-	leftButtonDownPoint    geometry.Point
+	leftButtonDownDuration  int
+	leftButtonDownPoint     geometry.Point
+	LeftButtonPressedEvent  event.Feed
+	LeftButtonReleasedEvent event.Feed
 }
 
 // NewMouse is shorcut method to defining a Mouse object
-func NewMouse(camera *render.Camera) *Mouse {
+func NewMouse() *Mouse {
 	return &Mouse{
-		camera:                 camera,
-		leftButtonDownDuration: 0,
-		leftButtonDownPoint:    geometry.NewPoint(0, 0),
+		leftButtonDownDuration:  0,
+		leftButtonDownPoint:     geometry.NewPoint(0, 0),
+		LeftButtonPressedEvent:  event.Feed{},
+		LeftButtonReleasedEvent: event.Feed{},
 	}
 }
 
 // Update is responsible for firing events related to the mouse object
-func (m *Mouse) Update(units []*Unit) []*Unit {
+func (m *Mouse) Update() {
+	m.fireEvents()
+	m.updateCount()
+}
+
+func (m *Mouse) fireEvents() {
+	if m.isLeftButtonJustPressed() {
+		m.leftButtonDownPoint = m.getMousePosition()
+		m.LeftButtonPressedEvent.Send(m.leftButtonDownPoint)
+	}
+
+	if m.isMouseButtonJustReleased() {
+		m.LeftButtonReleasedEvent.Send(m.getMouseSelectionRect())
+	}
+}
+
+func (m *Mouse) isMouseButtonJustReleased() bool {
+	return !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration != 0
+}
+
+func (m *Mouse) isLeftButtonJustPressed() bool {
+	return ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration == 0
+}
+
+func (m *Mouse) updateCount() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		m.leftButtonDownDuration++
-		if m.leftButtonDownDuration == 1 {
-			m.leftButtonDownPoint = m.position()
-		}
 	} else {
-		selectedUnits := make([]*Unit, 0)
-		if m.leftButtonDownDuration != 0 {
-			selectedUnits = m.selectUnits(units)
-			fmt.Printf("selected units length: %v\n", len(selectedUnits))
-		}
 		m.leftButtonDownDuration = 0
-		return selectedUnits
 	}
-
-	return []*Unit{}
-}
-
-func (m *Mouse) selectUnits(units []*Unit) []*Unit {
-	selectedUnits := make([]*Unit, 0)
-	for _, unit := range units {
-		cameraTranslation := m.camera.Translation
-		unitIsoRect := unit.GetDrawRectangle()
-		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
-		if m.getMouseSelectionRect().Intersects(unitIsoRect) {
-			selectedUnits = append(selectedUnits, unit)
-		}
-	}
-	return selectedUnits
-}
-
-func (m Mouse) isLeftButtonJustPressed() bool {
-	return m.leftButtonDownDuration == 1
-}
-
-func (m Mouse) isLeftButtonPressed() bool {
-	return m.leftButtonDownDuration != 0
 }
 
 // Draw is responsible for drawing any mouse related effects on the screen
@@ -73,15 +66,14 @@ func (m *Mouse) Draw(screen *ebiten.Image) {
 		opts := m.getMouseDrawOptions(rect)
 		img := getMouseImage(int(rect.Width), int(rect.Height))
 		screen.DrawImage(img, opts)
-	} else {
 	}
 }
 
 func (m *Mouse) getMouseSelectionRect() geometry.Rectangle {
-	return geometry.NewRectangleFromPoints(m.leftButtonDownPoint, m.position())
+	return geometry.NewRectangleFromPoints(m.leftButtonDownPoint, m.getMousePosition())
 }
 
-func (m *Mouse) position() geometry.Point {
+func (m *Mouse) getMousePosition() geometry.Point {
 	x, y := ebiten.CursorPosition()
 	return geometry.NewPoint(float64(x), float64(y))
 }
