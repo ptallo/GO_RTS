@@ -30,3 +30,12 @@ jobs:
 
       - name: Setup Go environment
         uses: actions/setup-go@v2.1.3
+      
+      - name: Go Get
+        run: go get -d -v -t
+      
+      - name: Go Build
+        run: go build ./...
+      
+      - name: Go Test
+        run: go test ./...
