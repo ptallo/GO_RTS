@@ -9,14 +9,14 @@ import (
 
 // Unit is an object describing a game unit
 type Unit struct {
-	spriteSheetLibrary *render.SpriteSheetLibrary
-	camera             *render.Camera
+	spriteSheetLibrary render.ISpriteSheetLibrary
+	camera             render.ICamera
 	point              geometry.Point
 	name               string
 }
 
 // NewUnit is a shorcut for creating a NewUnit
-func NewUnit(ssl *render.SpriteSheetLibrary, camera *render.Camera) *Unit {
+func NewUnit(ssl render.ISpriteSheetLibrary, camera render.ICamera) *Unit {
 	u := Unit{
 		spriteSheetLibrary: ssl,
 		camera:             camera,

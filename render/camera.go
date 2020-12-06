@@ -6,30 +6,32 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// ICamera is the interface which is implemented to provide camera usage
+type ICamera interface {
+	DrawImage(*ebiten.Image, *ebiten.Image, *ebiten.DrawImageOptions)
+	GetCameraMovements() []geometry.Point
+	Translation() *geometry.Point
+}
+
 // Camera is an object used to track how the screen has moved in a game
 type Camera struct {
-	Translation geometry.Point
+	translation *geometry.Point
 	Speed       float64
 }
 
 // NewCamera is a shortcut to creating a Camera object
-func NewCamera(t geometry.Point, s float64) *Camera {
+func NewCamera(t *geometry.Point, s float64) ICamera {
 	return &Camera{
-		Translation: t,
+		translation: t,
 		Speed:       s,
 	}
 }
 
 // DrawImage draws an image on a screen adjusted for the cameras translation
 func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOptions) {
-	inv := c.Translation.Inverse()
+	inv := c.translation.Inverse()
 	opts.GeoM.Translate(inv.X, inv.Y)
 	screen.DrawImage(img, opts)
-}
-
-// MoveCamera is a forwarding mechanism to translate the cameras current translation
-func (c *Camera) MoveCamera(p geometry.Point) {
-	c.Translation.Translate(p)
 }
 
 // GetCameraMovements will return how the camera should move given the current position of a mouse in relation to the window
@@ -54,4 +56,9 @@ func (c *Camera) GetCameraMovements() []geometry.Point {
 	}
 
 	return moves
+}
+
+// Translation gives the cameras current position
+func (c *Camera) Translation() *geometry.Point {
+	return c.translation
 }

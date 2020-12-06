@@ -8,12 +8,20 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// IMouse defines an interface for wrapping any mouse system
+type IMouse interface {
+	Update()
+	Draw(*ebiten.Image)
+	LeftButtonPressedEvent() *event.Feed
+	LeftButtonReleasedEvent() *event.Feed
+}
+
 // Mouse is an object wrapping all ebiten mouse utilities
 type Mouse struct {
 	leftButtonDownDuration  int
 	leftButtonDownPoint     geometry.Point
-	LeftButtonPressedEvent  event.Feed
-	LeftButtonReleasedEvent event.Feed
+	leftButtonPressedEvent  *event.Feed
+	leftButtonReleasedEvent *event.Feed
 }
 
 // NewMouse is shorcut method to defining a Mouse object
@@ -21,8 +29,8 @@ func NewMouse() *Mouse {
 	return &Mouse{
 		leftButtonDownDuration:  0,
 		leftButtonDownPoint:     geometry.NewPoint(0, 0),
-		LeftButtonPressedEvent:  event.Feed{},
-		LeftButtonReleasedEvent: event.Feed{},
+		leftButtonPressedEvent:  &event.Feed{},
+		leftButtonReleasedEvent: &event.Feed{},
 	}
 }
 
@@ -35,11 +43,11 @@ func (m *Mouse) Update() {
 func (m *Mouse) fireEvents() {
 	if m.isLeftButtonJustPressed() {
 		m.leftButtonDownPoint = m.getMousePosition()
-		m.LeftButtonPressedEvent.Send(m.leftButtonDownPoint)
+		m.leftButtonPressedEvent.Send(m.leftButtonDownPoint)
 	}
 
 	if m.isMouseButtonJustReleased() {
-		m.LeftButtonReleasedEvent.Send(m.getMouseSelectionRect())
+		m.leftButtonReleasedEvent.Send(m.getMouseSelectionRect())
 	}
 }
 
@@ -98,4 +106,14 @@ func getMouseImage(width, height int) *ebiten.Image {
 
 func isCloseToEdge(i, j int) bool {
 	return i == 0 || i == 1 || i == j-1 || i == j-2
+}
+
+// LeftButtonPressedEvent returns the event for pressing the left button
+func (m *Mouse) LeftButtonPressedEvent() *event.Feed {
+	return m.leftButtonPressedEvent
+}
+
+// LeftButtonReleasedEvent returns the event for releasing the left button
+func (m *Mouse) LeftButtonReleasedEvent() *event.Feed {
+	return m.leftButtonReleasedEvent
 }

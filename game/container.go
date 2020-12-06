@@ -7,12 +7,13 @@ import (
 
 // Container is an object which holds objects for the game
 type Container struct {
-	spriteSheetLibrary *render.SpriteSheetLibrary
-	camera             *render.Camera
+	spriteSheetLibrary render.ISpriteSheetLibrary
+	camera             render.ICamera
+	mouse              IMouse
 }
 
 // GetSpriteSheetLibrary will lazy-load a singleton SpriteSheetLibrary object
-func (c *Container) GetSpriteSheetLibrary() *render.SpriteSheetLibrary {
+func (c *Container) GetSpriteSheetLibrary() render.ISpriteSheetLibrary {
 	if c.spriteSheetLibrary == nil {
 		man, _ := render.NewSpriteSheet("units", "man")
 		woman, _ := render.NewSpriteSheet("units", "woman")
@@ -33,12 +34,21 @@ func (c *Container) GetSpriteSheetLibrary() *render.SpriteSheetLibrary {
 }
 
 // GetCamera will lazy-load a singleton camera object
-func (c *Container) GetCamera() *render.Camera {
+func (c *Container) GetCamera() render.ICamera {
+	p := geometry.NewPoint(0, 0)
 	if c.camera == nil {
 		c.camera = render.NewCamera(
-			geometry.NewPoint(0, 0),
+			&p,
 			5.0,
 		)
 	}
 	return c.camera
+}
+
+// GetMouse will lazy-load a singleton mouse object
+func (c *Container) GetMouse() IMouse {
+	if c.mouse == nil {
+		c.mouse = NewMouse()
+	}
+	return c.mouse
 }

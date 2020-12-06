@@ -9,6 +9,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// ISpriteSheetLibrary is an interface which defines a central store for sprite sheets
+type ISpriteSheetLibrary interface {
+	GetSpriteSheet(string) *SpriteSheet
+}
+
 // SpriteSheetLibrary is a wrapper around a map[string]*SpriteSheet
 type SpriteSheetLibrary struct {
 	Library map[string]*SpriteSheet
@@ -75,7 +80,7 @@ func NewSpriteSheetDefinitionFromJSON(path string) (SpriteSheetDefinition, error
 }
 
 // Draw will draw a SpriteSheet on a given screen and camera
-func (ss *SpriteSheet) Draw(screen *ebiten.Image, camera *Camera, opts *ebiten.DrawImageOptions) {
+func (ss *SpriteSheet) Draw(screen *ebiten.Image, camera ICamera, opts *ebiten.DrawImageOptions) {
 	rect := image.Rect(0, 0, ss.Definition.FrameWidth, ss.Definition.FrameHeight)
 	img := ss.Image.SubImage(rect).(*ebiten.Image)
 	camera.DrawImage(screen, img, opts)

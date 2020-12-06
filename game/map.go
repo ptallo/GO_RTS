@@ -9,8 +9,8 @@ import (
 
 // GameMap is a container for drawing a gameMap
 type GameMap struct {
-	ssl        *render.SpriteSheetLibrary
-	camera     *render.Camera
+	ssl        render.ISpriteSheetLibrary
+	camera     render.ICamera
 	tiles      []*Tile
 	tileNum    int
 	tileWidth  float64
@@ -24,7 +24,7 @@ type Tile struct {
 }
 
 // NewMap is a shorcut for defining a GameMap object
-func NewMap(ssl *render.SpriteSheetLibrary, camera *render.Camera) *GameMap {
+func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) *GameMap {
 	tiles := make([]*Tile, 0)
 	n := 10
 	tileW := 64.0

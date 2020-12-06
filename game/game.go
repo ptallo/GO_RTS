@@ -11,7 +11,6 @@ import (
 // Game an implementation of the interface provided by the ebiten v2 library
 type Game struct {
 	container     *Container
-	mouse         *Mouse
 	gameMap       *GameMap
 	units         []*Unit
 	selectedUnits []*Unit
@@ -23,10 +22,8 @@ type Game struct {
 // NewGame a shorcut method to instantiate a game object
 func NewGame() Game {
 	c := &Container{}
-	m := NewMouse()
 	game := Game{
 		container:                  c,
-		mouse:                      m,
 		gameMap:                    NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
 		units:                      []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
 		selectedUnits:              []*Unit{},
@@ -34,8 +31,8 @@ func NewGame() Game {
 		leftButtonReleasedListener: make(chan geometry.Rectangle, 1),
 	}
 
-	game.mouse.LeftButtonPressedEvent.Subscribe(game.leftButtonPressedListener)
-	game.mouse.LeftButtonReleasedEvent.Subscribe(game.leftButtonReleasedListener)
+	game.container.GetMouse().LeftButtonPressedEvent().Subscribe(game.leftButtonPressedListener)
+	game.container.GetMouse().LeftButtonReleasedEvent().Subscribe(game.leftButtonReleasedListener)
 
 	return game
 }
@@ -43,7 +40,7 @@ func NewGame() Game {
 // Update is used to update all the game logic
 func (g *Game) Update() error {
 	g.updateCameraPosition()
-	g.mouse.Update()
+	g.container.GetMouse().Update()
 	g.listenForEvents()
 	return nil
 }
@@ -59,10 +56,10 @@ func (g *Game) listenForEvents() {
 	}
 }
 
-func selectUnits(selectionRect geometry.Rectangle, camera *render.Camera, units []*Unit) []*Unit {
+func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units []*Unit) []*Unit {
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
-		cameraTranslation := camera.Translation
+		cameraTranslation := camera.Translation()
 		unitIsoRect := unit.GetDrawRectangle()
 		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
 		if selectionRect.Intersects(unitIsoRect) {
@@ -75,20 +72,20 @@ func selectUnits(selectionRect geometry.Rectangle, camera *render.Camera, units 
 func (g *Game) updateCameraPosition() {
 	moves := g.container.GetCamera().GetCameraMovements()
 	for _, move := range moves {
-		g.container.GetCamera().MoveCamera(move)
+		g.container.GetCamera().Translation().Translate(move)
 	}
 
 	mapPoints := g.gameMap.getMapPoints(1.0)
 	if !g.doesScreenContainPoints(mapPoints...) {
 		for _, move := range moves {
-			g.container.GetCamera().MoveCamera(move.Inverse())
+			g.container.GetCamera().Translation().Translate(move.Inverse())
 		}
 	}
 }
 
 func (g *Game) doesScreenContainPoints(points ...geometry.Point) bool {
 	width, height := ebiten.WindowSize()
-	screenOrigin := g.container.GetCamera().Translation
+	screenOrigin := g.container.GetCamera().Translation()
 	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X, screenOrigin.Y)
 
 	for _, p := range points {
@@ -105,7 +102,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, unit := range g.units {
 		unit.Draw(screen)
 	}
-	g.mouse.Draw(screen)
+	g.container.GetMouse().Draw(screen)
 }
 
 // Layout returns the layout of the screen
