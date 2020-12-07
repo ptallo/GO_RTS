@@ -1,5 +1,9 @@
 package geometry
 
+import (
+	"math"
+)
+
 // Point defines a single point in a 2d plane
 type Point struct {
 	X float64
@@ -28,6 +32,33 @@ func (p Point) Inverse() Point {
 // Equals checks if two points are equal
 func (p Point) Equals(point Point) bool {
 	return p.X == point.X && p.Y == point.Y
+}
+
+// DistanceFrom returns the distance from this point to another
+func (p Point) DistanceFrom(point Point) float64 {
+	return math.Sqrt(math.Pow(p.X-point.X, 2) + math.Pow(p.Y-point.Y, 2))
+}
+
+func (p Point) To(point Point) Point {
+	return Point{
+		X: point.X - p.X,
+		Y: point.Y - p.Y,
+	}
+}
+
+func (p Point) Unit() Point {
+	length := p.DistanceFrom(NewPoint(0.0, 0.0))
+	return Point{
+		X: p.X / length,
+		Y: p.Y / length,
+	}
+}
+
+func (p Point) Scale(scale float64) Point {
+	return Point{
+		X: p.X * scale,
+		Y: p.Y * scale,
+	}
 }
 
 // CartoToIso converts a point from a Cartesian point to a Isometric point

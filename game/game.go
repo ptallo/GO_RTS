@@ -42,6 +42,9 @@ func (g *Game) Update() error {
 	g.updateCameraPosition()
 	g.container.GetMouse().Update()
 	g.listenForEvents()
+	for _, u := range g.units {
+		u.PositionComponent.MoveTowardsDestination()
+	}
 	return nil
 }
 
@@ -51,6 +54,9 @@ func (g *Game) listenForEvents() {
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
 		fmt.Printf("number of selected Units=%v\n", len(g.selectedUnits))
 	case point := <-g.leftButtonPressedListener:
+		for _, u := range g.selectedUnits {
+			u.PositionComponent.SetDestination(point)
+		}
 		fmt.Printf("thing pressed here: %v\n", point)
 	default:
 	}
