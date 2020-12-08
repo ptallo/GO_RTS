@@ -14,6 +14,7 @@ type IMouse interface {
 	Draw(*ebiten.Image)
 	LeftButtonPressedEvent() *event.Feed
 	LeftButtonReleasedEvent() *event.Feed
+	RightButtonPressedEvent() *event.Feed
 }
 
 // Mouse is an object wrapping all ebiten mouse utilities
@@ -22,6 +23,9 @@ type Mouse struct {
 	leftButtonDownPoint     geometry.Point
 	leftButtonPressedEvent  *event.Feed
 	leftButtonReleasedEvent *event.Feed
+	rightButtonDownDuration int
+	rightButtonDownPoint    geometry.Point
+	rightButtonPressedEvent *event.Feed
 }
 
 // NewMouse is shorcut method to defining a Mouse object
@@ -31,6 +35,9 @@ func NewMouse() *Mouse {
 		leftButtonDownPoint:     geometry.NewPoint(0, 0),
 		leftButtonPressedEvent:  &event.Feed{},
 		leftButtonReleasedEvent: &event.Feed{},
+		rightButtonDownDuration: 0,
+		rightButtonDownPoint:    geometry.NewPoint(0, 0),
+		rightButtonPressedEvent: &event.Feed{},
 	}
 }
 
@@ -46,12 +53,17 @@ func (m *Mouse) fireEvents() {
 		m.leftButtonPressedEvent.Send(m.leftButtonDownPoint)
 	}
 
-	if m.isMouseButtonJustReleased() {
+	if m.isLeftButtonJustReleased() {
 		m.leftButtonReleasedEvent.Send(m.getMouseSelectionRect())
+	}
+
+	if m.isRightButtonJustPressed() {
+		m.rightButtonDownPoint = m.getMousePosition()
+		m.rightButtonPressedEvent.Send(m.rightButtonDownPoint)
 	}
 }
 
-func (m *Mouse) isMouseButtonJustReleased() bool {
+func (m *Mouse) isLeftButtonJustReleased() bool {
 	return !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration != 0
 }
 
@@ -59,11 +71,25 @@ func (m *Mouse) isLeftButtonJustPressed() bool {
 	return ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && m.leftButtonDownDuration == 0
 }
 
+func (m *Mouse) isRightButtonJustReleased() bool {
+	return !ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && m.rightButtonDownDuration != 0
+}
+
+func (m *Mouse) isRightButtonJustPressed() bool {
+	return ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) && m.rightButtonDownDuration == 0
+}
+
 func (m *Mouse) updateCount() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		m.leftButtonDownDuration++
 	} else {
 		m.leftButtonDownDuration = 0
+	}
+
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		m.rightButtonDownDuration++
+	} else {
+		m.rightButtonDownDuration = 0
 	}
 }
 
@@ -116,4 +142,9 @@ func (m *Mouse) LeftButtonPressedEvent() *event.Feed {
 // LeftButtonReleasedEvent returns the event for releasing the left button
 func (m *Mouse) LeftButtonReleasedEvent() *event.Feed {
 	return m.leftButtonReleasedEvent
+}
+
+// RightButtonPressedEvent returns the event for pressing the right button
+func (m *Mouse) RightButtonPressedEvent() *event.Feed {
+	return m.rightButtonPressedEvent
 }
