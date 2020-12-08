@@ -39,6 +39,7 @@ func (p Point) DistanceFrom(point Point) float64 {
 	return math.Sqrt(math.Pow(p.X-point.X, 2) + math.Pow(p.Y-point.Y, 2))
 }
 
+// To return a vector describing the point from p to the argument
 func (p Point) To(point Point) Point {
 	return Point{
 		X: point.X - p.X,
@@ -46,6 +47,7 @@ func (p Point) To(point Point) Point {
 	}
 }
 
+// Unit returns the current point scaled to unit length
 func (p Point) Unit() Point {
 	length := p.DistanceFrom(NewPoint(0.0, 0.0))
 	return Point{
@@ -54,6 +56,7 @@ func (p Point) Unit() Point {
 	}
 }
 
+// Scale scales the current vector by a certain scale
 func (p Point) Scale(scale float64) Point {
 	return Point{
 		X: p.X * scale,
