@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"go_rts/geometry"
 	"go_rts/render"
 
@@ -17,6 +16,7 @@ type Game struct {
 
 	leftButtonPressedListener  chan geometry.Point
 	leftButtonReleasedListener chan geometry.Rectangle
+	rightButtonPressedListener chan geometry.Point
 }
 
 // NewGame a shorcut method to instantiate a game object
@@ -29,10 +29,12 @@ func NewGame() Game {
 		selectedUnits:              []*Unit{},
 		leftButtonPressedListener:  make(chan geometry.Point, 1),
 		leftButtonReleasedListener: make(chan geometry.Rectangle, 1),
+		rightButtonPressedListener: make(chan geometry.Point, 1),
 	}
 
 	game.container.GetMouse().LeftButtonPressedEvent().Subscribe(game.leftButtonPressedListener)
 	game.container.GetMouse().LeftButtonReleasedEvent().Subscribe(game.leftButtonReleasedListener)
+	game.container.GetMouse().RightButtonPressedEvent().Subscribe(game.rightButtonPressedListener)
 
 	return game
 }
@@ -52,12 +54,14 @@ func (g *Game) listenForEvents() {
 	select {
 	case rect := <-g.leftButtonReleasedListener:
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
-		fmt.Printf("number of selected Units=%v\n", len(g.selectedUnits))
-	case point := <-g.leftButtonPressedListener:
-		for _, u := range g.selectedUnits {
-			u.PositionComponent.SetDestination(point)
-		}
-		fmt.Printf("thing pressed here: %v\n", point)
+	case _ = <-g.leftButtonPressedListener:
+		g.selectedUnits = []*Unit{}
+	default:
+	}
+
+	select {
+	case point := <-g.rightButtonPressedListener:
+		g.setUnitsDestination(&point)
 	default:
 	}
 }
@@ -73,6 +77,14 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 		}
 	}
 	return selectedUnits
+}
+
+func (g *Game) setUnitsDestination(p *geometry.Point) {
+	p.Translate(*g.container.GetCamera().Translation())
+	destination := geometry.IsoToCarto(*p)
+	for _, u := range g.selectedUnits {
+		u.PositionComponent.SetDestination(destination)
+	}
 }
 
 func (g *Game) updateCameraPosition() {
