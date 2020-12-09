@@ -1,7 +1,7 @@
 package components_test
 
 import (
-	"go_rts/game/components"
+	"go_rts/components"
 	"go_rts/geometry"
 	"math"
 	"testing"

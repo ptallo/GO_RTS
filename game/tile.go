@@ -1,7 +1,7 @@
 package game
 
 import (
-	"go_rts/game/components"
+	"go_rts/components"
 	"go_rts/geometry"
 	"go_rts/render"
 )
