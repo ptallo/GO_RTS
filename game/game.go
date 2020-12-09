@@ -9,8 +9,7 @@ import (
 
 // Game an implementation of the interface provided by the ebiten v2 library
 type Game struct {
-	container    *Container
-	eventHandler *EventHandler
+	container *Container
 
 	tiles         []*Tile
 	units         []*Unit
@@ -22,13 +21,12 @@ func NewGame() Game {
 	c := &Container{}
 	game := Game{
 		container:     c,
-		eventHandler:  NewEventHandler(),
 		tiles:         NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
 		units:         []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
 		selectedUnits: []*Unit{},
 	}
 
-	game.eventHandler.Subscribe(game.container.GetMouse())
+	game.container.GetEventHandler().Subscribe(game.container.GetMouse())
 
 	return game
 }

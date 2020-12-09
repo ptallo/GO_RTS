@@ -10,6 +10,7 @@ type Container struct {
 	spriteSheetLibrary render.ISpriteSheetLibrary
 	camera             render.ICamera
 	mouse              IMouse
+	eventHandler       *EventHandler
 }
 
 // GetSpriteSheetLibrary will lazy-load a singleton SpriteSheetLibrary object
@@ -51,4 +52,12 @@ func (c *Container) GetMouse() IMouse {
 		c.mouse = NewMouse()
 	}
 	return c.mouse
+}
+
+// GetEventHandler will lazy-load a singleton EventHandler
+func (c *Container) GetEventHandler() *EventHandler {
+	if c.eventHandler == nil {
+		c.eventHandler = NewEventHandler()
+	}
+	return c.eventHandler
 }
