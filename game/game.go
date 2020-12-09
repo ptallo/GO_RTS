@@ -44,15 +44,15 @@ func (g *Game) Update() error {
 
 func (g *Game) listenForEvents() {
 	select {
-	case rect := <-g.eventHandler.LeftButtonReleasedListener:
+	case rect := <-g.container.GetEventHandler().LeftButtonReleasedListener:
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
-	case _ = <-g.eventHandler.LeftButtonPressedListener:
+	case _ = <-g.container.GetEventHandler().LeftButtonPressedListener:
 		g.selectedUnits = []*Unit{}
 	default:
 	}
 
 	select {
-	case point := <-g.eventHandler.RightButtonPressedListener:
+	case point := <-g.container.GetEventHandler().RightButtonPressedListener:
 		g.setUnitsDestination(&point)
 	default:
 	}
