@@ -10,7 +10,7 @@ import (
 // Game an implementation of the interface provided by the ebiten v2 library
 type Game struct {
 	container     *Container
-	gameMap       *GameMap
+	tiles         []*Tile
 	units         []*Unit
 	selectedUnits []*Unit
 
@@ -24,7 +24,7 @@ func NewGame() Game {
 	c := &Container{}
 	game := Game{
 		container:                  c,
-		gameMap:                    NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		tiles:                      NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
 		units:                      []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
 		selectedUnits:              []*Unit{},
 		leftButtonPressedListener:  make(chan geometry.Point, 1),
@@ -70,7 +70,7 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
 		cameraTranslation := camera.Translation()
-		unitIsoRect := unit.GetDrawRectangle()
+		unitIsoRect := unit.RenderComponent.GetDrawRectangle(*unit.PositionComponent.GetPosition())
 		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
 		if selectionRect.Intersects(unitIsoRect) {
 			selectedUnits = append(selectedUnits, unit)
@@ -93,7 +93,11 @@ func (g *Game) updateCameraPosition() {
 		g.container.GetCamera().Translation().Translate(move)
 	}
 
-	mapPoints := g.gameMap.getMapPoints(1.0)
+	mapPoints := make([]geometry.Point, 0)
+	for _, tile := range g.tiles {
+		mapPoints = append(mapPoints, tile.GetIsometricTileCorners()...)
+	}
+
 	if !g.doesScreenContainPoints(mapPoints...) {
 		for _, move := range moves {
 			g.container.GetCamera().Translation().Translate(move.Inverse())
@@ -116,9 +120,12 @@ func (g *Game) doesScreenContainPoints(points ...geometry.Point) bool {
 
 // Draw is used to draw any relevant images on the screen
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.gameMap.Draw(screen)
+	for _, tile := range g.tiles {
+		tile.RenderComponent.Draw(screen, geometry.CartoToIso(*tile.PositionComponent.GetPosition()))
+	}
+
 	for _, unit := range g.units {
-		unit.Draw(screen)
+		unit.RenderComponent.Draw(screen, geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
 	}
 	g.container.GetMouse().Draw(screen)
 }
