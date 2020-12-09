@@ -9,32 +9,26 @@ import (
 
 // Game an implementation of the interface provided by the ebiten v2 library
 type Game struct {
-	container     *Container
+	container    *Container
+	eventHandler *EventHandler
+
 	tiles         []*Tile
 	units         []*Unit
 	selectedUnits []*Unit
-
-	leftButtonPressedListener  chan geometry.Point
-	leftButtonReleasedListener chan geometry.Rectangle
-	rightButtonPressedListener chan geometry.Point
 }
 
 // NewGame a shorcut method to instantiate a game object
 func NewGame() Game {
 	c := &Container{}
 	game := Game{
-		container:                  c,
-		tiles:                      NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
-		units:                      []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
-		selectedUnits:              []*Unit{},
-		leftButtonPressedListener:  make(chan geometry.Point, 1),
-		leftButtonReleasedListener: make(chan geometry.Rectangle, 1),
-		rightButtonPressedListener: make(chan geometry.Point, 1),
+		container:     c,
+		eventHandler:  NewEventHandler(),
+		tiles:         NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		units:         []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
+		selectedUnits: []*Unit{},
 	}
 
-	game.container.GetMouse().LeftButtonPressedEvent().Subscribe(game.leftButtonPressedListener)
-	game.container.GetMouse().LeftButtonReleasedEvent().Subscribe(game.leftButtonReleasedListener)
-	game.container.GetMouse().RightButtonPressedEvent().Subscribe(game.rightButtonPressedListener)
+	game.eventHandler.Subscribe(game.container.GetMouse())
 
 	return game
 }
@@ -52,15 +46,15 @@ func (g *Game) Update() error {
 
 func (g *Game) listenForEvents() {
 	select {
-	case rect := <-g.leftButtonReleasedListener:
+	case rect := <-g.eventHandler.LeftButtonReleasedListener:
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
-	case _ = <-g.leftButtonPressedListener:
+	case _ = <-g.eventHandler.LeftButtonPressedListener:
 		g.selectedUnits = []*Unit{}
 	default:
 	}
 
 	select {
-	case point := <-g.rightButtonPressedListener:
+	case point := <-g.eventHandler.RightButtonPressedListener:
 		g.setUnitsDestination(&point)
 	default:
 	}
