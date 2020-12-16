@@ -44,7 +44,7 @@ func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
 func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, p geometry.Point) *Tile {
 	return &Tile{
 		RenderComponent:   components.NewRenderComponent(ssl, cam, name, geometry.NewPoint(-64.0, 0.0)),
-		PositionComponent: components.NewPositionComponent(p, 0.0, tileWidth, tileHeight),
+		PositionComponent: components.NewPositionComponent(geometry.NewRectangle(tileWidth, tileHeight, p.X, p.Y), 0.0),
 	}
 }
 

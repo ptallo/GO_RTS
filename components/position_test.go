@@ -31,7 +31,7 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 	start := geometry.NewPoint(0.0, 0.0)
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 2.0
-	p := components.NewPositionComponent(start, speed, 20.0, 20.0)
+	p := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
 	pcs := getMapPositionComponents(ctrl)
 
 	// Act
@@ -55,7 +55,7 @@ func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
 	start := geometry.NewPoint(0.0, 0.0)
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 1000000.0
-	p := components.NewPositionComponent(start, speed, 5.0, 5.0)
+	p := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
 	pcs := getMapPositionComponents(ctrl)
 
 	// Act
@@ -82,7 +82,7 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedD
 
 	// Arrange
 	pcs := getMapPositionComponents(ctrl)
-	p := components.NewPositionComponent(geometry.NewPoint(200.0, 200.0), 3.0, 5.0, 5.0)
+	p := components.NewPositionComponent(geometry.NewRectangle(5.0, 5.0, 200.0, 200.0), 3.0)
 
 	// Act
 	p.SetDestination(goalDestination, pcs)
@@ -92,4 +92,20 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedD
 	if !expectedDestination.Equals(actualDestination) {
 		t.Errorf("actual destination %v should equal expected destinaton %v", actualDestination, expectedDestination)
 	}
+}
+
+func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Arrange
+	tiles := getMapPositionComponents(ctrl)
+	p1 := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 1000.0)
+	_ = []components.IPositionComponent{components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
+
+	// Act
+	p1.SetDestination(geometry.NewPoint(30.0, 0.0), tiles)
+	p1.MoveTowardsDestination()
+
+	// Assert
 }

@@ -13,33 +13,29 @@ type IPositionComponent interface {
 }
 
 // NewPositionComponent is a shortcut to create a PositionComponent
-func NewPositionComponent(position geometry.Point, speed, width, height float64) *PositionComponent {
+func NewPositionComponent(rect geometry.Rectangle, speed float64) *PositionComponent {
 	return &PositionComponent{
-		Position:    &position,
-		Destination: &position,
+		Rectangle:   &rect,
+		Destination: rect.Point,
 		Speed:       speed,
-		width:       width,
-		height:      height,
 	}
 }
 
 // PositionComponent is a struct which implements the IPositionComponent
 type PositionComponent struct {
-	Position    *geometry.Point
+	Rectangle   *geometry.Rectangle
 	Destination *geometry.Point
 	Speed       float64
-	width       float64
-	height      float64
 }
 
 // GetPosition returns the current position of the PositionComponent
 func (p *PositionComponent) GetPosition() *geometry.Point {
-	return p.Position
+	return p.Rectangle.Point
 }
 
 // GetRectangle returns the rectangle describing this position component
 func (p *PositionComponent) GetRectangle() geometry.Rectangle {
-	return geometry.NewRectangle(p.width, p.height, p.Position.X, p.Position.Y)
+	return *p.Rectangle
 }
 
 // SetDestination sets the destination of the PositionComponent
@@ -79,13 +75,13 @@ func isInTiles(p geometry.Point, tiles []IPositionComponent) bool {
 
 // MoveTowardsDestination defines how to move towards the destination
 func (p *PositionComponent) MoveTowardsDestination() {
-	if p.Position.DistanceFrom(*p.Destination) < p.Speed {
-		p.Position = p.Destination
+	if p.Rectangle.Point.DistanceFrom(*p.Destination) < p.Speed {
+		p.Rectangle.Point = p.Destination
 	} else {
-		p.Position.Translate(p.getNextCandidatePosition())
+		p.Rectangle.Point.Translate(p.getNextCandidatePosition())
 	}
 }
 
 func (p *PositionComponent) getNextCandidatePosition() geometry.Point {
-	return p.Position.To(*p.Destination).Unit().Scale(p.Speed)
+	return p.Rectangle.Point.To(*p.Destination).Unit().Scale(p.Speed)
 }

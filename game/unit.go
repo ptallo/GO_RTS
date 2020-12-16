@@ -16,7 +16,7 @@ type Unit struct {
 func NewUnit(ssl render.ISpriteSheetLibrary, camera render.ICamera) *Unit {
 	u := Unit{
 		RenderComponent:   components.NewRenderComponent(ssl, camera, "man", geometry.NewPoint(0.0, 0.0)),
-		PositionComponent: components.NewPositionComponent(geometry.NewPoint(10.0, 10.0), 5.0, 20.0, 20.0),
+		PositionComponent: components.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, 20.0, 20.0), 5.0),
 	}
 	return &u
 }
