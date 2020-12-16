@@ -16,3 +16,6 @@ vendor/
 
 # ide settings
 .vscode
+
+# mockgen folder
+mocks/

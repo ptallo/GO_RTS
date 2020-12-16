@@ -9,6 +9,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//go:generate mockgen -destination=../mocks/mock_ISpriteSheetLibrary.go -package=mocks go_rts/render ISpriteSheetLibrary
+
 // ISpriteSheetLibrary is an interface which defines a central store for sprite sheets
 type ISpriteSheetLibrary interface {
 	GetSpriteSheet(string) *SpriteSheet
