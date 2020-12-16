@@ -43,8 +43,8 @@ func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
 // NewTile is a shortcut for creating a Tile
 func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, p geometry.Point) *Tile {
 	return &Tile{
-		RenderComponent:   components.NewRenderComponent(ssl, cam, name),
-		PositionComponent: components.NewPositionComponent(p, 0.0),
+		RenderComponent:   components.NewRenderComponent(ssl, cam, name, geometry.NewPoint(-64.0, 0.0)),
+		PositionComponent: components.NewPositionComponent(p, 0.0, tileWidth, tileHeight),
 	}
 }
 
