@@ -36,7 +36,7 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 
 	// Act
 	p.SetDestination(dest, pcs)
-	p.MoveTowardsDestination()
+	p.MoveTowardsDestination([]components.IPositionComponent{})
 
 	// Assert
 	end := p.GetPosition()
@@ -60,7 +60,7 @@ func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
 
 	// Act
 	p.SetDestination(dest, pcs)
-	p.MoveTowardsDestination()
+	p.MoveTowardsDestination([]components.IPositionComponent{})
 
 	// Assert
 	end := p.GetPosition()
@@ -100,12 +100,18 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 
 	// Arrange
 	tiles := getMapPositionComponents(ctrl)
-	p1 := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 1000.0)
-	_ = []components.IPositionComponent{components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
+	p1 := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
+	pcs := []components.IPositionComponent{components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
 
 	// Act
-	p1.SetDestination(geometry.NewPoint(30.0, 0.0), tiles)
-	p1.MoveTowardsDestination()
+	goalDestination := geometry.NewPoint(30.0, 0.0)
+	p1.SetDestination(goalDestination, tiles)
+	for i := 0; i < 1000; i++ {
+		p1.MoveTowardsDestination(pcs)
+	}
 
 	// Assert
+	if p1.GetPosition().Equals(goalDestination) {
+		t.Errorf("shouldn't be able to move through a position component between you and your desitination")
+	}
 }

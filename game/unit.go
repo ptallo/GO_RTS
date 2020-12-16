@@ -13,10 +13,10 @@ type Unit struct {
 }
 
 // NewUnit is a shorcut for creating a NewUnit
-func NewUnit(ssl render.ISpriteSheetLibrary, camera render.ICamera) *Unit {
+func NewUnit(ssl render.ISpriteSheetLibrary, camera render.ICamera, startPosition geometry.Point) *Unit {
 	u := Unit{
 		RenderComponent:   components.NewRenderComponent(ssl, camera, "man", geometry.NewPoint(0.0, 0.0)),
-		PositionComponent: components.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, 20.0, 20.0), 5.0),
+		PositionComponent: components.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, startPosition.X, startPosition.Y), 5.0),
 	}
 	return &u
 }

@@ -21,9 +21,12 @@ type Game struct {
 func NewGame() Game {
 	c := &Container{}
 	game := Game{
-		container:     c,
-		tiles:         NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
-		units:         []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
+		container: c,
+		tiles:     NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		units: []*Unit{
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(40.0, 40.0)),
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(200.0, 200.0)),
+		},
 		selectedUnits: []*Unit{},
 	}
 
@@ -38,8 +41,14 @@ func (g *Game) Update() error {
 	g.container.GetMouse().Update()
 	g.listenForEvents()
 
-	for _, u := range g.units {
-		u.PositionComponent.MoveTowardsDestination()
+	for i, u := range g.units {
+		otherUnits := make([]components.IPositionComponent, 0)
+		for j := range g.units {
+			if i != j {
+				otherUnits = append(otherUnits, g.units[j].PositionComponent)
+			}
+		}
+		u.PositionComponent.MoveTowardsDestination(otherUnits)
 	}
 	return nil
 }

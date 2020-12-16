@@ -9,7 +9,7 @@ type IPositionComponent interface {
 	GetPosition() *geometry.Point
 	GetRectangle() geometry.Rectangle
 	SetDestination(geometry.Point, []IPositionComponent)
-	MoveTowardsDestination()
+	MoveTowardsDestination([]IPositionComponent)
 }
 
 // NewPositionComponent is a shortcut to create a PositionComponent
@@ -74,14 +74,32 @@ func isInTiles(p geometry.Point, tiles []IPositionComponent) bool {
 }
 
 // MoveTowardsDestination defines how to move towards the destination
-func (p *PositionComponent) MoveTowardsDestination() {
-	if p.Rectangle.Point.DistanceFrom(*p.Destination) < p.Speed {
-		p.Rectangle.Point = p.Destination
-	} else {
-		p.Rectangle.Point.Translate(p.getNextCandidatePosition())
+func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionComponent) {
+	newTranslationVector := *p.getTranslationVector()
+	p.Rectangle.Point.Translate(newTranslationVector)
+
+	if willCollide(p, collidables) {
+		p.Rectangle.Point.Translate(newTranslationVector.Inverse())
 	}
 }
 
-func (p *PositionComponent) getNextCandidatePosition() geometry.Point {
-	return p.Rectangle.Point.To(*p.Destination).Unit().Scale(p.Speed)
+func (p *PositionComponent) getTranslationVector() *geometry.Point {
+	var returnPoint geometry.Point
+	if p.Rectangle.Point.DistanceFrom(*p.Destination) == 0.0 {
+		returnPoint = geometry.NewPoint(0.0, 0.0)
+	} else if p.Rectangle.Point.DistanceFrom(*p.Destination) < p.Speed {
+		returnPoint = p.Rectangle.Point.To(*p.Destination)
+	} else {
+		returnPoint = p.Rectangle.Point.To(*p.Destination).Unit().Scale(p.Speed)
+	}
+	return &returnPoint
+}
+
+func willCollide(pc IPositionComponent, others []IPositionComponent) bool {
+	for _, o := range others {
+		if o.GetRectangle().Intersects(pc.GetRectangle()) {
+			return true
+		}
+	}
+	return false
 }
