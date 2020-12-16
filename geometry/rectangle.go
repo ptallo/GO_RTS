@@ -52,3 +52,15 @@ func (r Rectangle) Contains(p Point) bool {
 func (r Rectangle) ToString() string {
 	return fmt.Sprintf("%g %g %v", r.Width, r.Height, r.Point)
 }
+
+// GetCorners returns the four-corners of a rectangle
+func (r Rectangle) GetCorners() []Point {
+	x := r.Point.X
+	y := r.Point.Y
+	return []Point{
+		NewPoint(x, y),
+		NewPoint(x+r.Width, y),
+		NewPoint(x, y+r.Height),
+		NewPoint(x+r.Width, y+r.Height),
+	}
+}

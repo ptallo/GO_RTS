@@ -1,6 +1,7 @@
 package game
 
 import (
+	"go_rts/components"
 	"go_rts/geometry"
 	"go_rts/render"
 
@@ -36,6 +37,7 @@ func (g *Game) Update() error {
 	g.updateCameraPosition()
 	g.container.GetMouse().Update()
 	g.listenForEvents()
+
 	for _, u := range g.units {
 		u.PositionComponent.MoveTowardsDestination()
 	}
@@ -62,7 +64,7 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
 		cameraTranslation := camera.Translation()
-		unitIsoRect := unit.RenderComponent.GetDrawRectangle(*unit.PositionComponent.GetPosition())
+		unitIsoRect := unit.RenderComponent.GetDrawRectangle(geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
 		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
 		if selectionRect.Intersects(unitIsoRect) {
 			selectedUnits = append(selectedUnits, unit)
@@ -72,10 +74,15 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 }
 
 func (g *Game) setUnitsDestination(p *geometry.Point) {
+	tilePositionComponents := make([]components.IPositionComponent, 0)
+	for _, tile := range g.tiles {
+		tilePositionComponents = append(tilePositionComponents, tile.PositionComponent)
+	}
+
 	p.Translate(*g.container.GetCamera().Translation())
 	destination := geometry.IsoToCarto(*p)
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(destination)
+		u.PositionComponent.SetDestination(destination, tilePositionComponents)
 	}
 }
 

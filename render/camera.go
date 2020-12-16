@@ -6,6 +6,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//go:generate mockgen -destination=../mocks/mock_ICamera.go -package=mocks go_rts/render ICamera
+
 // ICamera is the interface which is implemented to provide camera usage
 type ICamera interface {
 	DrawImage(*ebiten.Image, *ebiten.Image, *ebiten.DrawImageOptions)

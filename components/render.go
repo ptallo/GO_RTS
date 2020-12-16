@@ -18,14 +18,16 @@ type RenderComponent struct {
 	spriteSheetLibrary render.ISpriteSheetLibrary
 	camera             render.ICamera
 	name               string
+	renderOffset       geometry.Point
 }
 
 // NewRenderComponent creates a IRenderComponent object
-func NewRenderComponent(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string) IRenderComponent {
+func NewRenderComponent(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, renderOffset geometry.Point) IRenderComponent {
 	return &RenderComponent{
 		spriteSheetLibrary: ssl,
 		camera:             cam,
 		name:               name,
+		renderOffset:       renderOffset,
 	}
 }
 
@@ -33,6 +35,7 @@ func NewRenderComponent(ssl render.ISpriteSheetLibrary, cam render.ICamera, name
 func (r *RenderComponent) Draw(screen *ebiten.Image, pointToDraw geometry.Point) {
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(pointToDraw.X, pointToDraw.Y)
+	opts.GeoM.Translate(r.renderOffset.X, r.renderOffset.Y)
 	ss := r.spriteSheetLibrary.GetSpriteSheet(r.name)
 	ss.Draw(screen, r.camera, opts)
 }
