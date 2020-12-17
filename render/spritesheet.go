@@ -81,9 +81,9 @@ func NewSpriteSheetDefinitionFromJSON(path string) (SpriteSheetDefinition, error
 	return ssd, err
 }
 
-// Draw will draw a SpriteSheet on a given screen and camera
-func (ss *SpriteSheet) Draw(screen *ebiten.Image, camera ICamera, opts *ebiten.DrawImageOptions) {
+// GetImage will return the current frame of the spritesheet
+func (ss *SpriteSheet) GetImage() *ebiten.Image {
 	rect := image.Rect(0, 0, ss.Definition.FrameWidth, ss.Definition.FrameHeight)
 	img := ss.Image.SubImage(rect).(*ebiten.Image)
-	camera.DrawImage(screen, img, opts)
+	return img
 }

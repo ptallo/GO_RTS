@@ -31,8 +31,7 @@ func NewCamera(t *geometry.Point, s float64) ICamera {
 
 // DrawImage draws an image on a screen adjusted for the cameras translation
 func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOptions) {
-	inv := c.translation.Inverse()
-	opts.GeoM.Translate(inv.X, inv.Y)
+	opts.GeoM.Translate(-c.translation.X, -c.translation.Y)
 	screen.DrawImage(img, opts)
 }
 

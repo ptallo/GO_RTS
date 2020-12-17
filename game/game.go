@@ -21,9 +21,12 @@ type Game struct {
 func NewGame() Game {
 	c := &Container{}
 	game := Game{
-		container:     c,
-		tiles:         NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
-		units:         []*Unit{NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera())},
+		container: c,
+		tiles:     NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		units: []*Unit{
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 100.0)),
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 300.0)),
+		},
 		selectedUnits: []*Unit{},
 	}
 
@@ -39,14 +42,30 @@ func (g *Game) Update() error {
 	g.listenForEvents()
 
 	for _, u := range g.units {
-		u.PositionComponent.MoveTowardsDestination()
+		u.PositionComponent.MoveTowardsDestination(g.getCollidableComponents(u))
 	}
 	return nil
+}
+
+func (g *Game) getCollidableComponents(unit *Unit) []components.IPositionComponent {
+	otherUnits := make([]components.IPositionComponent, 0)
+	for _, u := range g.units {
+		if u != unit {
+			otherUnits = append(otherUnits, u.PositionComponent)
+		}
+	}
+	for _, tile := range g.tiles {
+		if !tile.IsPathable {
+			otherUnits = append(otherUnits, tile.PositionComponent)
+		}
+	}
+	return otherUnits
 }
 
 func (g *Game) listenForEvents() {
 	select {
 	case rect := <-g.container.GetEventHandler().LeftButtonReleasedListener:
+		rect.Point.Translate(*g.container.GetCamera().Translation())
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
 	case _ = <-g.container.GetEventHandler().LeftButtonPressedListener:
 		g.selectedUnits = []*Unit{}
@@ -55,6 +74,7 @@ func (g *Game) listenForEvents() {
 
 	select {
 	case point := <-g.container.GetEventHandler().RightButtonPressedListener:
+		point.Translate(*g.container.GetCamera().Translation())
 		g.setUnitsDestination(&point)
 	default:
 	}
@@ -63,10 +83,7 @@ func (g *Game) listenForEvents() {
 func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units []*Unit) []*Unit {
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
-		cameraTranslation := camera.Translation()
-		unitIsoRect := unit.RenderComponent.GetDrawRectangle(geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
-		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
-		if selectionRect.Intersects(unitIsoRect) {
+		if selectionRect.Intersects(unit.PositionComponent.GetRectangle()) {
 			selectedUnits = append(selectedUnits, unit)
 		}
 	}
@@ -79,10 +96,8 @@ func (g *Game) setUnitsDestination(p *geometry.Point) {
 		tilePositionComponents = append(tilePositionComponents, tile.PositionComponent)
 	}
 
-	p.Translate(*g.container.GetCamera().Translation())
-	destination := geometry.IsoToCarto(*p)
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(destination, tilePositionComponents)
+		u.PositionComponent.SetDestination(*p, tilePositionComponents)
 	}
 }
 
@@ -120,11 +135,11 @@ func (g *Game) doesScreenContainPoints(points ...geometry.Point) bool {
 // Draw is used to draw any relevant images on the screen
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, tile := range g.tiles {
-		tile.RenderComponent.Draw(screen, geometry.CartoToIso(*tile.PositionComponent.GetPosition()))
+		tile.RenderComponent.Draw(screen, *tile.PositionComponent.GetPosition())
 	}
 
 	for _, unit := range g.units {
-		unit.RenderComponent.Draw(screen, geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
+		unit.RenderComponent.Draw(screen, *unit.PositionComponent.GetPosition())
 	}
 	g.container.GetMouse().Draw(screen)
 }

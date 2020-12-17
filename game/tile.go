@@ -16,6 +16,7 @@ const (
 type Tile struct {
 	RenderComponent   components.IRenderComponent
 	PositionComponent components.IPositionComponent
+	IsPathable        bool
 }
 
 // NewMap is a shorcut for defining a GameMap object
@@ -28,12 +29,12 @@ func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
 				float64(j)*tileHeight,
 			)
 
-			tileName := "grass"
 			if i == 0 || j == 0 || i == tileNum-1 || j == tileNum-1 {
-				tileName = "water"
+				tiles = append(tiles, NewWaterTile(ssl, camera, p))
+			} else {
+				tiles = append(tiles, NewGrassTile(ssl, camera, p))
 			}
 
-			tiles = append(tiles, NewTile(ssl, camera, tileName, p))
 		}
 	}
 
@@ -41,21 +42,32 @@ func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
 }
 
 // NewTile is a shortcut for creating a Tile
-func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, p geometry.Point) *Tile {
+func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, isPathable bool, p geometry.Point) *Tile {
 	return &Tile{
-		RenderComponent:   components.NewRenderComponent(ssl, cam, name, geometry.NewPoint(-64.0, 0.0)),
-		PositionComponent: components.NewPositionComponent(p, 0.0, tileWidth, tileHeight),
+		RenderComponent:   components.NewRenderComponent(ssl, cam, name),
+		PositionComponent: components.NewPositionComponent(geometry.NewRectangle(tileWidth, tileHeight, p.X, p.Y), 0.0),
+		IsPathable:        isPathable,
 	}
+}
+
+// NewWaterTile is a shortcut to create a water tile
+func NewWaterTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
+	return NewTile(ssl, cam, "water", false, p)
+}
+
+// NewGrassTile is a shortcut to create a grass tile
+func NewGrassTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
+	return NewTile(ssl, cam, "grass", true, p)
 }
 
 // GetIsometricTileCorners returns the four corners of the tile in isometric space
 func (t *Tile) GetIsometricTileCorners() []geometry.Point {
 	tileOrigin := t.PositionComponent.GetPosition()
 	points := []geometry.Point{
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X, tileOrigin.Y)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X, tileOrigin.Y+tileHeight)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y+tileHeight)),
+		geometry.NewPoint(tileOrigin.X, tileOrigin.Y),
+		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y),
+		geometry.NewPoint(tileOrigin.X, tileOrigin.Y+tileHeight),
+		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y+tileHeight),
 	}
 	return points
 }
