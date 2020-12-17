@@ -24,8 +24,8 @@ func NewGame() Game {
 		container: c,
 		tiles:     NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
 		units: []*Unit{
-			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(40.0, 40.0)),
-			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(200.0, 200.0)),
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 100.0)),
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 300.0)),
 		},
 		selectedUnits: []*Unit{},
 	}
@@ -41,21 +41,31 @@ func (g *Game) Update() error {
 	g.container.GetMouse().Update()
 	g.listenForEvents()
 
-	for i, u := range g.units {
-		otherUnits := make([]components.IPositionComponent, 0)
-		for j := range g.units {
-			if i != j {
-				otherUnits = append(otherUnits, g.units[j].PositionComponent)
-			}
-		}
-		u.PositionComponent.MoveTowardsDestination(otherUnits)
+	for _, u := range g.units {
+		u.PositionComponent.MoveTowardsDestination(g.getCollidableComponents(u))
 	}
 	return nil
+}
+
+func (g *Game) getCollidableComponents(unit *Unit) []components.IPositionComponent {
+	otherUnits := make([]components.IPositionComponent, 0)
+	for _, u := range g.units {
+		if u != unit {
+			otherUnits = append(otherUnits, u.PositionComponent)
+		}
+	}
+	for _, tile := range g.tiles {
+		if !tile.IsPathable {
+			otherUnits = append(otherUnits, tile.PositionComponent)
+		}
+	}
+	return otherUnits
 }
 
 func (g *Game) listenForEvents() {
 	select {
 	case rect := <-g.container.GetEventHandler().LeftButtonReleasedListener:
+		rect.Point.Translate(*g.container.GetCamera().Translation())
 		g.selectedUnits = selectUnits(rect, g.container.GetCamera(), g.units)
 	case _ = <-g.container.GetEventHandler().LeftButtonPressedListener:
 		g.selectedUnits = []*Unit{}
@@ -64,6 +74,7 @@ func (g *Game) listenForEvents() {
 
 	select {
 	case point := <-g.container.GetEventHandler().RightButtonPressedListener:
+		point.Translate(*g.container.GetCamera().Translation())
 		g.setUnitsDestination(&point)
 	default:
 	}
@@ -72,10 +83,7 @@ func (g *Game) listenForEvents() {
 func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units []*Unit) []*Unit {
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
-		cameraTranslation := camera.Translation()
-		unitIsoRect := unit.RenderComponent.GetDrawRectangle(*unit.PositionComponent.GetPosition())
-		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
-		if selectionRect.Intersects(unitIsoRect) {
+		if selectionRect.Intersects(unit.PositionComponent.GetRectangle()) {
 			selectedUnits = append(selectedUnits, unit)
 		}
 	}
@@ -88,7 +96,6 @@ func (g *Game) setUnitsDestination(p *geometry.Point) {
 		tilePositionComponents = append(tilePositionComponents, tile.PositionComponent)
 	}
 
-	p.Translate(*g.container.GetCamera().Translation())
 	for _, u := range g.selectedUnits {
 		u.PositionComponent.SetDestination(*p, tilePositionComponents)
 	}
