@@ -52,10 +52,10 @@ func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, p 
 func (t *Tile) GetIsometricTileCorners() []geometry.Point {
 	tileOrigin := t.PositionComponent.GetPosition()
 	points := []geometry.Point{
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X, tileOrigin.Y)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X, tileOrigin.Y+tileHeight)),
-		geometry.CartoToIso(geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y+tileHeight)),
+		geometry.NewPoint(tileOrigin.X, tileOrigin.Y),
+		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y),
+		geometry.NewPoint(tileOrigin.X, tileOrigin.Y+tileHeight),
+		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y+tileHeight),
 	}
 	return points
 }

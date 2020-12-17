@@ -63,19 +63,3 @@ func (p Point) Scale(scale float64) Point {
 		Y: p.Y * scale,
 	}
 }
-
-// CartoToIso converts a point from a Cartesian point to a Isometric point
-func CartoToIso(p Point) Point {
-	return Point{
-		X: p.X - p.Y,
-		Y: (p.X + p.Y) / 2,
-	}
-}
-
-// IsoToCarto converts a point from a Isometric point to a Isometric point
-func IsoToCarto(p Point) Point {
-	return Point{
-		X: (2*p.Y + p.X) / 2,
-		Y: (2*p.Y - p.X) / 2,
-	}
-}

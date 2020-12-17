@@ -73,7 +73,7 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 	selectedUnits := make([]*Unit, 0)
 	for _, unit := range units {
 		cameraTranslation := camera.Translation()
-		unitIsoRect := unit.RenderComponent.GetDrawRectangle(geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
+		unitIsoRect := unit.RenderComponent.GetDrawRectangle(*unit.PositionComponent.GetPosition())
 		unitIsoRect.Point.Translate(cameraTranslation.Inverse())
 		if selectionRect.Intersects(unitIsoRect) {
 			selectedUnits = append(selectedUnits, unit)
@@ -89,9 +89,8 @@ func (g *Game) setUnitsDestination(p *geometry.Point) {
 	}
 
 	p.Translate(*g.container.GetCamera().Translation())
-	destination := geometry.IsoToCarto(*p)
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(destination, tilePositionComponents)
+		u.PositionComponent.SetDestination(*p, tilePositionComponents)
 	}
 }
 
@@ -129,11 +128,11 @@ func (g *Game) doesScreenContainPoints(points ...geometry.Point) bool {
 // Draw is used to draw any relevant images on the screen
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, tile := range g.tiles {
-		tile.RenderComponent.Draw(screen, geometry.CartoToIso(*tile.PositionComponent.GetPosition()))
+		tile.RenderComponent.Draw(screen, *tile.PositionComponent.GetPosition())
 	}
 
 	for _, unit := range g.units {
-		unit.RenderComponent.Draw(screen, geometry.CartoToIso(*unit.PositionComponent.GetPosition()))
+		unit.RenderComponent.Draw(screen, *unit.PositionComponent.GetPosition())
 	}
 	g.container.GetMouse().Draw(screen)
 }
