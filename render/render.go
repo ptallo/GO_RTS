@@ -1,8 +1,7 @@
-package components
+package render
 
 import (
 	"go_rts/geometry"
-	"go_rts/render"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -15,13 +14,13 @@ type IRenderComponent interface {
 
 // RenderComponent implements the IRenderComponent interface
 type RenderComponent struct {
-	spriteSheetLibrary render.ISpriteSheetLibrary
-	camera             render.ICamera
+	spriteSheetLibrary ISpriteSheetLibrary
+	camera             ICamera
 	name               string
 }
 
 // NewRenderComponent creates a IRenderComponent object
-func NewRenderComponent(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string) IRenderComponent {
+func NewRenderComponent(ssl ISpriteSheetLibrary, cam ICamera, name string) IRenderComponent {
 	return &RenderComponent{
 		spriteSheetLibrary: ssl,
 		camera:             cam,

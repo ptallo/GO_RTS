@@ -8,8 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//go:generate mockgen -destination=../mocks/mock_IMouse.go -package=mocks go_rts/game IMouse
-
 // IMouse defines an interface for wrapping any mouse system
 type IMouse interface {
 	Update()

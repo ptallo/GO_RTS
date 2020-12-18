@@ -1,7 +1,6 @@
 package game
 
 import (
-	"go_rts/components"
 	"go_rts/geometry"
 	"go_rts/render"
 
@@ -47,8 +46,8 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) getCollidableComponents(unit *Unit) []components.IPositionComponent {
-	otherUnits := make([]components.IPositionComponent, 0)
+func (g *Game) getCollidableComponents(unit *Unit) []geometry.IPositionComponent {
+	otherUnits := make([]geometry.IPositionComponent, 0)
 	for _, u := range g.units {
 		if u != unit {
 			otherUnits = append(otherUnits, u.PositionComponent)
@@ -91,7 +90,7 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 }
 
 func (g *Game) setUnitsDestination(p *geometry.Point) {
-	tilePositionComponents := make([]components.IPositionComponent, 0)
+	tilePositionComponents := make([]geometry.IPositionComponent, 0)
 	for _, tile := range g.tiles {
 		tilePositionComponents = append(tilePositionComponents, tile.PositionComponent)
 	}

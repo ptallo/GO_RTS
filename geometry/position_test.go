@@ -1,42 +1,35 @@
-package components_test
+package geometry_test
 
 import (
-	"go_rts/components"
-	"go_rts/game"
 	"go_rts/geometry"
-	"go_rts/mocks"
 	"math"
 	"testing"
-
-	"github.com/golang/mock/gomock"
 )
 
-func getMapPositionComponents(ctrl *gomock.Controller) []components.IPositionComponent {
-	mockSSL := mocks.NewMockISpriteSheetLibrary(ctrl)
-	mockCamera := mocks.NewMockICamera(ctrl)
-
-	tiles := game.NewMap(mockSSL, mockCamera)
-	pcs := make([]components.IPositionComponent, 0)
-	for _, tile := range tiles {
-		pcs = append(pcs, tile.PositionComponent)
+func getMapPositionComponents() []geometry.IPositionComponent {
+	tileWidth := 64.0
+	tileHeight := 64.0
+	pcs := make([]geometry.IPositionComponent, 0)
+	for i := 0.0; i < 10.0; i++ {
+		for j := 0.0; j < 10.0; j++ {
+			rect := geometry.NewRectangle(tileWidth, tileHeight, i*tileWidth, j*tileHeight)
+			pcs = append(pcs, geometry.NewPositionComponent(rect, 0.0))
+		}
 	}
 	return pcs
 }
 
 func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
 	// Arrange
 	start := geometry.NewPoint(0.0, 0.0)
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 2.0
-	p := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
-	pcs := getMapPositionComponents(ctrl)
+	p := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
+	pcs := getMapPositionComponents()
 
 	// Act
 	p.SetDestination(dest, pcs)
-	p.MoveTowardsDestination([]components.IPositionComponent{})
+	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
 	end := p.GetPosition()
@@ -48,19 +41,16 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 }
 
 func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
 	// Arrange
 	start := geometry.NewPoint(0.0, 0.0)
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 1000000.0
-	p := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
-	pcs := getMapPositionComponents(ctrl)
+	p := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
+	pcs := getMapPositionComponents()
 
 	// Act
 	p.SetDestination(dest, pcs)
-	p.MoveTowardsDestination([]components.IPositionComponent{})
+	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
 	end := p.GetPosition()
@@ -77,12 +67,9 @@ func Test_GivenDestinationNotInMap_WhenSettingDestination_ThenStopsAtEdge(t *tes
 }
 
 func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedDestination geometry.Point) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
 	// Arrange
-	pcs := getMapPositionComponents(ctrl)
-	p := components.NewPositionComponent(geometry.NewRectangle(5.0, 5.0, 200.0, 200.0), 3.0)
+	pcs := getMapPositionComponents()
+	p := geometry.NewPositionComponent(geometry.NewRectangle(5.0, 5.0, 200.0, 200.0), 3.0)
 
 	// Act
 	p.SetDestination(goalDestination, pcs)
@@ -95,13 +82,10 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedD
 }
 
 func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
 	// Arrange
-	tiles := getMapPositionComponents(ctrl)
-	p1 := components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
-	pcs := []components.IPositionComponent{components.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
+	tiles := getMapPositionComponents()
+	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
+	pcs := []geometry.IPositionComponent{geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
 
 	// Act
 	goalDestination := geometry.NewPoint(30.0, 0.0)

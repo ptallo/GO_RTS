@@ -1,19 +1,15 @@
-package components
-
-import (
-	"go_rts/geometry"
-)
+package geometry
 
 // IPositionComponent is an interface which describes how to handle position
 type IPositionComponent interface {
-	GetPosition() *geometry.Point
-	GetRectangle() geometry.Rectangle
-	SetDestination(geometry.Point, []IPositionComponent)
+	GetPosition() *Point
+	GetRectangle() Rectangle
+	SetDestination(Point, []IPositionComponent)
 	MoveTowardsDestination([]IPositionComponent)
 }
 
 // NewPositionComponent is a shortcut to create a PositionComponent
-func NewPositionComponent(rect geometry.Rectangle, speed float64) *PositionComponent {
+func NewPositionComponent(rect Rectangle, speed float64) *PositionComponent {
 	return &PositionComponent{
 		Rectangle:   &rect,
 		Destination: rect.Point,
@@ -23,23 +19,23 @@ func NewPositionComponent(rect geometry.Rectangle, speed float64) *PositionCompo
 
 // PositionComponent is a struct which implements the IPositionComponent
 type PositionComponent struct {
-	Rectangle   *geometry.Rectangle
-	Destination *geometry.Point
+	Rectangle   *Rectangle
+	Destination *Point
 	Speed       float64
 }
 
 // GetPosition returns the current position of the PositionComponent
-func (p *PositionComponent) GetPosition() *geometry.Point {
+func (p *PositionComponent) GetPosition() *Point {
 	return p.Rectangle.Point
 }
 
 // GetRectangle returns the rectangle describing this position component
-func (p *PositionComponent) GetRectangle() geometry.Rectangle {
+func (p *PositionComponent) GetRectangle() Rectangle {
 	return *p.Rectangle
 }
 
 // SetDestination sets the destination of the PositionComponent
-func (p *PositionComponent) SetDestination(dest geometry.Point, tiles []IPositionComponent) {
+func (p *PositionComponent) SetDestination(dest Point, tiles []IPositionComponent) {
 	if isInTiles(dest, tiles) {
 		p.Destination = &dest
 	} else {
@@ -48,9 +44,9 @@ func (p *PositionComponent) SetDestination(dest geometry.Point, tiles []IPositio
 	}
 }
 
-func getDestinationInTiles(goalDest geometry.Point, tiles []IPositionComponent) geometry.Point {
+func getDestinationInTiles(goalDest Point, tiles []IPositionComponent) Point {
 	minTileDistance := 99999999.0
-	var minTilePoint geometry.Point
+	var minTilePoint Point
 	for _, t := range tiles {
 		for _, p := range t.GetRectangle().GetCorners() {
 			dist := p.DistanceFrom(goalDest)
@@ -63,7 +59,7 @@ func getDestinationInTiles(goalDest geometry.Point, tiles []IPositionComponent) 
 	return minTilePoint
 }
 
-func isInTiles(p geometry.Point, tiles []IPositionComponent) bool {
+func isInTiles(p Point, tiles []IPositionComponent) bool {
 	inTiles := false
 	for _, t := range tiles {
 		if t.GetRectangle().Contains(p) {
@@ -83,10 +79,10 @@ func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionCompon
 	}
 }
 
-func (p *PositionComponent) getTranslationVector() *geometry.Point {
-	var returnPoint geometry.Point
+func (p *PositionComponent) getTranslationVector() *Point {
+	var returnPoint Point
 	if p.Rectangle.Point.DistanceFrom(*p.Destination) == 0.0 {
-		returnPoint = geometry.NewPoint(0.0, 0.0)
+		returnPoint = NewPoint(0.0, 0.0)
 	} else if p.Rectangle.Point.DistanceFrom(*p.Destination) < p.Speed {
 		returnPoint = p.Rectangle.Point.To(*p.Destination)
 	} else {
