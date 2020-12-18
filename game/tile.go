@@ -1,9 +1,12 @@
 package game
 
 import (
+	"bufio"
 	"go_rts/components"
 	"go_rts/geometry"
 	"go_rts/render"
+	"os"
+	"strings"
 )
 
 const (
@@ -34,8 +37,34 @@ func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
 			} else {
 				tiles = append(tiles, NewGrassTile(ssl, camera, p))
 			}
-
 		}
+	}
+
+	return tiles
+}
+
+// NewMapFromFile loads a map from a file
+func NewMapFromFile(ssl render.ISpriteSheetLibrary, camera render.ICamera, filePath string) []*Tile {
+	file, err := os.Open(filePath)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	tiles := make([]*Tile, 0)
+	i := 0
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		for j, char := range strings.Split(line, "") {
+			point := geometry.NewPoint(float64(i)*tileWidth, float64(j)*tileHeight)
+			if char == "A" {
+				tiles = append(tiles, NewGrassTile(ssl, camera, point))
+			} else if char == "B" {
+				tiles = append(tiles, NewWaterTile(ssl, camera, point))
+			}
+		}
+		i++
 	}
 
 	return tiles

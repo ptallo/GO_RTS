@@ -22,7 +22,7 @@ func NewGame() Game {
 	c := &Container{}
 	game := Game{
 		container: c,
-		tiles:     NewMap(c.GetSpriteSheetLibrary(), c.GetCamera()),
+		tiles:     NewMapFromFile(c.GetSpriteSheetLibrary(), c.GetCamera(), "./assets/maps/map1.txt"),
 		units: []*Unit{
 			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 100.0)),
 			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 300.0)),
