@@ -22,27 +22,6 @@ type Tile struct {
 	IsPathable        bool
 }
 
-// NewMap is a shorcut for defining a GameMap object
-func NewMap(ssl render.ISpriteSheetLibrary, camera render.ICamera) []*Tile {
-	tiles := make([]*Tile, 0)
-	for i := 0; i < tileNum; i++ {
-		for j := 0; j < tileNum; j++ {
-			p := geometry.NewPoint(
-				float64(i)*tileWidth,
-				float64(j)*tileHeight,
-			)
-
-			if i == 0 || j == 0 || i == tileNum-1 || j == tileNum-1 {
-				tiles = append(tiles, NewWaterTile(ssl, camera, p))
-			} else {
-				tiles = append(tiles, NewGrassTile(ssl, camera, p))
-			}
-		}
-	}
-
-	return tiles
-}
-
 // NewMapFromFile loads a map from a file
 func NewMapFromFile(ssl render.ISpriteSheetLibrary, camera render.ICamera, filePath string) []*Tile {
 	file, err := os.Open(filePath)
@@ -52,22 +31,27 @@ func NewMapFromFile(ssl render.ISpriteSheetLibrary, camera render.ICamera, fileP
 	defer file.Close()
 
 	tiles := make([]*Tile, 0)
-	i := 0
+	i := -1
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
+		i++
 		line := scanner.Text()
 		for j, char := range strings.Split(line, "") {
 			point := geometry.NewPoint(float64(i)*tileWidth, float64(j)*tileHeight)
-			if char == "A" {
-				tiles = append(tiles, NewGrassTile(ssl, camera, point))
-			} else if char == "B" {
-				tiles = append(tiles, NewWaterTile(ssl, camera, point))
-			}
+			tiles = append(tiles, convertCharacterToTile(char, ssl, camera, point))
 		}
-		i++
 	}
 
 	return tiles
+}
+
+func convertCharacterToTile(char string, ssl render.ISpriteSheetLibrary, camera render.ICamera, point geometry.Point) *Tile {
+	if char == "A" {
+		return NewGrassTile(ssl, camera, point)
+	} else if char == "B" {
+		return NewWaterTile(ssl, camera, point)
+	}
+	return nil
 }
 
 // NewTile is a shortcut for creating a Tile
