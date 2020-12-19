@@ -4,7 +4,7 @@ package geometry
 type IPositionComponent interface {
 	GetPosition() *Point
 	GetRectangle() Rectangle
-	SetDestination(Point, []IPositionComponent)
+	SetDestination(Point, Rectangle, []IPositionComponent)
 	MoveTowardsDestination([]IPositionComponent)
 }
 
@@ -35,38 +35,39 @@ func (p *PositionComponent) GetRectangle() Rectangle {
 }
 
 // SetDestination sets the destination of the PositionComponent
-func (p *PositionComponent) SetDestination(dest Point, tiles []IPositionComponent) {
-	if isInTiles(dest, tiles) {
+func (p *PositionComponent) SetDestination(dest Point, mapRect Rectangle, collidables []IPositionComponent) {
+	if mapRect.Contains(dest) {
 		p.Destination = &dest
 	} else {
-		newDest := getDestinationInTiles(dest, tiles)
+		newDest := getInMapDestination(dest, mapRect)
 		p.Destination = &newDest
 	}
 }
 
-func getDestinationInTiles(goalDest Point, tiles []IPositionComponent) Point {
-	minTileDistance := 99999999.0
-	var minTilePoint Point
-	for _, t := range tiles {
-		for _, p := range t.GetRectangle().GetCorners() {
-			dist := p.DistanceFrom(goalDest)
-			if dist < minTileDistance {
-				minTileDistance = dist
-				minTilePoint = p
-			}
-		}
+func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
+	if mapRect.Contains(goalDest) {
+		return goalDest
 	}
-	return minTilePoint
-}
 
-func isInTiles(p Point, tiles []IPositionComponent) bool {
-	inTiles := false
-	for _, t := range tiles {
-		if t.GetRectangle().Contains(p) {
-			inTiles = true
-		}
+	var newX float64
+	if goalDest.X < mapRect.Point.X {
+		newX = mapRect.Point.X
+	} else if goalDest.X > mapRect.Point.X+mapRect.Width {
+		newX = mapRect.Point.X + mapRect.Width
+	} else {
+		newX = goalDest.X
 	}
-	return inTiles
+
+	var newY float64
+	if goalDest.Y < mapRect.Point.Y {
+		newY = mapRect.Point.Y
+	} else if goalDest.Y > mapRect.Point.Y+mapRect.Height {
+		newY = mapRect.Point.Y + mapRect.Height
+	} else {
+		newY = goalDest.Y
+	}
+
+	return NewPoint(newX, newY)
 }
 
 // MoveTowardsDestination defines how to move towards the destination

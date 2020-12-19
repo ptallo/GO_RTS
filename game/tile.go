@@ -2,6 +2,7 @@ package game
 
 import (
 	"bufio"
+	"fmt"
 	"go_rts/geometry"
 	"go_rts/render"
 	"os"
@@ -72,14 +73,46 @@ func NewGrassTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry
 	return NewTile(ssl, cam, "grass", true, p)
 }
 
-// GetIsometricTileCorners returns the four corners of the tile in isometric space
-func (t *Tile) GetIsometricTileCorners() []geometry.Point {
-	tileOrigin := t.PositionComponent.GetPosition()
-	points := []geometry.Point{
-		geometry.NewPoint(tileOrigin.X, tileOrigin.Y),
-		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y),
-		geometry.NewPoint(tileOrigin.X, tileOrigin.Y+tileHeight),
-		geometry.NewPoint(tileOrigin.X+tileWidth, tileOrigin.Y+tileHeight),
+// GetMapRectangle returns the rectangle describing the map
+func GetMapRectangle(tiles []*Tile) geometry.Rectangle {
+	minX := 999999999.0
+	maxX := -999999999.0
+	minY := 999999999.0
+	maxY := -999999999.0
+
+	for _, tile := range tiles {
+		tileRect := tile.PositionComponent.GetRectangle()
+		if minX > tileRect.Point.X {
+			minX = tileRect.Point.X
+		} else if maxX < tileRect.Point.X+tileRect.Width {
+			maxX = tileRect.Point.X + tileRect.Width
+		}
+
+		if minY > tileRect.Point.Y {
+			minY = tileRect.Point.Y
+		} else if maxY < tileRect.Point.Y+tileRect.Height {
+			maxY = tileRect.Point.Y + tileRect.Height
+		}
 	}
-	return points
+
+	return geometry.NewRectangleFromPoints(
+		geometry.NewPoint(minX, minY),
+		geometry.NewPoint(maxX, maxY),
+	)
+}
+
+func ShrinkMapRectangle(mapRect geometry.Rectangle, percentage float64) geometry.Rectangle {
+	if percentage > 1 {
+		panic(fmt.Sprintf("shrink percentage %v should be less than 1", percentage))
+	}
+
+	newWidth := mapRect.Width * percentage
+	newHeight := mapRect.Height * percentage
+
+	return geometry.NewRectangle(
+		newWidth,
+		newHeight,
+		mapRect.Point.X+(mapRect.Width-newWidth)/2,
+		mapRect.Point.Y+(mapRect.Height-newHeight)/2,
+	)
 }

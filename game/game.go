@@ -90,13 +90,10 @@ func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units 
 }
 
 func (g *Game) setUnitsDestination(p *geometry.Point) {
-	tilePositionComponents := make([]geometry.IPositionComponent, 0)
-	for _, tile := range g.tiles {
-		tilePositionComponents = append(tilePositionComponents, tile.PositionComponent)
-	}
+	mapRect := GetMapRectangle(g.tiles)
 
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(*p, tilePositionComponents)
+		u.PositionComponent.SetDestination(*p, mapRect, []geometry.IPositionComponent{})
 	}
 }
 
@@ -106,29 +103,19 @@ func (g *Game) updateCameraPosition() {
 		g.container.GetCamera().Translation().Translate(move)
 	}
 
-	mapPoints := make([]geometry.Point, 0)
-	for _, tile := range g.tiles {
-		mapPoints = append(mapPoints, tile.GetIsometricTileCorners()...)
-	}
-
-	if !g.doesScreenContainPoints(mapPoints...) {
+	screenRect := getScreenRect(g.container.GetCamera())
+	mapRect := ShrinkMapRectangle(GetMapRectangle(g.tiles), 0.5)
+	if !screenRect.Intersects(mapRect) {
 		for _, move := range moves {
 			g.container.GetCamera().Translation().Translate(move.Inverse())
 		}
 	}
 }
 
-func (g *Game) doesScreenContainPoints(points ...geometry.Point) bool {
+func getScreenRect(cam render.ICamera) geometry.Rectangle {
 	width, height := ebiten.WindowSize()
-	screenOrigin := g.container.GetCamera().Translation()
-	screenRect := geometry.NewRectangle(float64(width), float64(height), screenOrigin.X, screenOrigin.Y)
-
-	for _, p := range points {
-		if screenRect.Contains(p) {
-			return true
-		}
-	}
-	return false
+	screenOrigin := cam.Translation()
+	return geometry.NewRectangle(float64(width), float64(height), screenOrigin.X, screenOrigin.Y)
 }
 
 // Draw is used to draw any relevant images on the screen
