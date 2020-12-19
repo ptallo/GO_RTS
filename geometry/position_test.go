@@ -25,10 +25,10 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 2.0
 	p := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
-	pcs := getMapPositionComponents()
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(dest, pcs)
+	p.SetDestination(dest, mapRect, []geometry.IPositionComponent{})
 	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
@@ -46,10 +46,10 @@ func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
 	dest := geometry.NewPoint(10.0, 10.0)
 	speed := 1000000.0
 	p := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, start.X, start.Y), speed)
-	pcs := getMapPositionComponents()
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(dest, pcs)
+	p.SetDestination(dest, mapRect, []geometry.IPositionComponent{})
 	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
@@ -60,19 +60,19 @@ func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
 }
 
 func Test_GivenDestinationNotInMap_WhenSettingDestination_ThenStopsAtEdge(t *testing.T) {
-	tryToMoveOutsideMap(t, geometry.NewPoint(-20.0, 200.0), geometry.NewPoint(0.0, 192.0))
-	tryToMoveOutsideMap(t, geometry.NewPoint(200.0, -20.0), geometry.NewPoint(192.0, 0.0))
-	tryToMoveOutsideMap(t, geometry.NewPoint(1000.0, 200.0), geometry.NewPoint(640.0, 192.0))
-	tryToMoveOutsideMap(t, geometry.NewPoint(200.0, 1000.0), geometry.NewPoint(192.0, 640.0))
+	tryToMoveOutsideMap(t, geometry.NewPoint(-20.0, 200.0), geometry.NewPoint(0.0, 200.0))
+	tryToMoveOutsideMap(t, geometry.NewPoint(200.0, -20.0), geometry.NewPoint(200.0, 0.0))
+	tryToMoveOutsideMap(t, geometry.NewPoint(1200.0, 200.0), geometry.NewPoint(1000.0, 200.0))
+	tryToMoveOutsideMap(t, geometry.NewPoint(200.0, 1200.0), geometry.NewPoint(200.0, 1000.0))
 }
 
 func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedDestination geometry.Point) {
 	// Arrange
-	pcs := getMapPositionComponents()
 	p := geometry.NewPositionComponent(geometry.NewRectangle(5.0, 5.0, 200.0, 200.0), 3.0)
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(goalDestination, pcs)
+	p.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{})
 
 	// Assert
 	actualDestination := *p.Destination
@@ -83,13 +83,14 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedD
 
 func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T) {
 	// Arrange
-	tiles := getMapPositionComponents()
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
 	pcs := []geometry.IPositionComponent{geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
 	goalDestination := geometry.NewPoint(30.0, 0.0)
-	p1.SetDestination(goalDestination, tiles)
+	p1.SetDestination(goalDestination, mapRect, pcs)
+
 	for i := 0; i < 1000; i++ {
 		p1.MoveTowardsDestination(pcs)
 	}
