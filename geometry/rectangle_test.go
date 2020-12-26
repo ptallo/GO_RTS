@@ -46,3 +46,67 @@ func Test_GivenRectangle_WhenDoesntContainPoint_ThenReturnsFalse(t *testing.T) {
 		}
 	}
 }
+
+func Test_GivenAdjacentRectangles_ThenIsAdjacentToReturnsTrue(t *testing.T) {
+	shouldBeAdjacent(
+		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
+		geometry.NewRectangle(64.0, 64.0, 64.0, 0.0),
+		t,
+	)
+
+	shouldBeAdjacent(
+		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
+		geometry.NewRectangle(64.0, 64.0, -64.0, 0.0),
+		t,
+	)
+
+	shouldBeAdjacent(
+		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
+		geometry.NewRectangle(64.0, 64.0, 0.0, 64.0),
+		t,
+	)
+
+	shouldBeAdjacent(
+		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
+		geometry.NewRectangle(64.0, 64.0, 0.0, -64.0),
+		t,
+	)
+}
+
+func shouldBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
+	if !r1.IsAdjacentTo(r2) {
+		t.Errorf("rects %v and %v should be adjacent", r1, r2)
+	}
+}
+
+func Test_GivenNonAdjacentRectangles_ThenIsAdjacentToReturnsFalse(t *testing.T) {
+	shouldNotBeAdjacent(
+		geometry.NewRectangle(10.0, 10.0, 0.0, 0.0),
+		geometry.NewRectangle(10.0, 10.0, 10.0, 10.0),
+		t,
+	)
+
+	shouldNotBeAdjacent(
+		geometry.NewRectangle(10.0, 10.0, 0.0, 0.0),
+		geometry.NewRectangle(10.0, 10.0, -10.0, -10.0),
+		t,
+	)
+
+	shouldNotBeAdjacent(
+		geometry.NewRectangle(10.0, 10.0, 0.0, 0.0),
+		geometry.NewRectangle(10.0, 10.0, 10.0, -10.0),
+		t,
+	)
+
+	shouldNotBeAdjacent(
+		geometry.NewRectangle(10.0, 10.0, 0.0, 0.0),
+		geometry.NewRectangle(10.0, 10.0, -10.0, 10.0),
+		t,
+	)
+}
+
+func shouldNotBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
+	if r1.IsAdjacentTo(r2) {
+		t.Errorf("rects %v and %v should not be adjacent", r1.ToString(), r2.ToString())
+	}
+}

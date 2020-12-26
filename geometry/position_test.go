@@ -6,19 +6,6 @@ import (
 	"testing"
 )
 
-func getMapPositionComponents() []geometry.IPositionComponent {
-	tileWidth := 64.0
-	tileHeight := 64.0
-	pcs := make([]geometry.IPositionComponent, 0)
-	for i := 0.0; i < 10.0; i++ {
-		for j := 0.0; j < 10.0; j++ {
-			rect := geometry.NewRectangle(tileWidth, tileHeight, i*tileWidth, j*tileHeight)
-			pcs = append(pcs, geometry.NewPositionComponent(rect, 0.0))
-		}
-	}
-	return pcs
-}
-
 func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.T) {
 	// Arrange
 	start := geometry.NewPoint(0.0, 0.0)
@@ -40,7 +27,7 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 	}
 }
 
-func Test_WhenMovingTowardsDesination_ThenWillNotOverStep(t *testing.T) {
+func Test_WhenMovingTowardsDestination_ThenWillNotOverStep(t *testing.T) {
 	// Arrange
 	start := geometry.NewPoint(0.0, 0.0)
 	dest := geometry.NewPoint(10.0, 10.0)
@@ -88,7 +75,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	goalDestination := geometry.NewPoint(30.0, 0.0)
+	goalDestination := geometry.NewPoint(15.0, 5.0)
 	p1.SetDestination(goalDestination, mapRect, pcs)
 
 	for i := 0; i < 1000; i++ {
@@ -96,7 +83,26 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 	}
 
 	// Assert
-	if p1.GetPosition().Equals(goalDestination) {
-		t.Errorf("shouldn't be able to move through a position component between you and your desitination")
+	if p1.GetPosition().Equals(goalDestination) || p1.GetRectangle().Intersects(pcs[0].GetRectangle()) {
+		t.Error("shouldn't be able to move into un-pathable component")
+	}
+}
+
+func Test_GivenUnpathableComponent_WhenMoving_ThenPathsAround(t *testing.T) {
+	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
+	pcs := []geometry.IPositionComponent{geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 20.0, 0.0), 1000.0)}
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, -500.0, -500.0)
+
+	// Act
+	goalDestination := geometry.NewPoint(40.0, 0.0)
+	p1.SetDestination(goalDestination, mapRect, pcs)
+
+	for i := 0; i < 1000; i++ {
+		p1.MoveTowardsDestination(pcs)
+	}
+
+	// Assert
+	if !p1.GetPosition().Equals(goalDestination) {
+		t.Error("Should path around un-pathable components")
 	}
 }

@@ -32,6 +32,35 @@ func NewRectangleFromPoints(p1, p2 Point) Rectangle {
 	return NewRectangle(x2-x, y2-y, x, y)
 }
 
+// Equals checks to see if this rect is equal to another
+func (r Rectangle) Equals(r2 Rectangle) bool {
+	return r.Point.Equals(*r2.Point) && r.Width == r2.Width && r.Height == r.Height
+}
+
+// IsAdjacentTo checkts to see if this rect exists next to another in 2d space
+func (r Rectangle) IsAdjacentTo(r2 Rectangle) bool {
+	return r.isAbove(r2) ||
+		r.isBelow(r2) ||
+		r.isLeftOf(r2) ||
+		r.isRightOf(r2)
+}
+
+func (r Rectangle) isAbove(r2 Rectangle) bool {
+	return r.Point.Y+r.Height == r2.Point.Y && r.Point.X == r2.Point.X && r.Width == r2.Width
+}
+
+func (r Rectangle) isBelow(r2 Rectangle) bool {
+	return r.Point.Y == r2.Point.Y+r2.Height && r.Point.X == r2.Point.X && r.Width == r2.Width
+}
+
+func (r Rectangle) isLeftOf(r2 Rectangle) bool {
+	return r.Point.X+r.Width == r2.Point.X && r.Point.Y == r2.Point.Y && r.Width == r2.Width
+}
+
+func (r Rectangle) isRightOf(r2 Rectangle) bool {
+	return r.Point.X == r2.Point.X+r2.Width && r.Point.Y == r2.Point.Y && r.Width == r2.Width
+}
+
 // Intersects checks if one rectangle intersects another rectangle
 func (r Rectangle) Intersects(r2 Rectangle) bool {
 	if r.Point.X >= r2.Point.X+r2.Width || r2.Point.X >= r.Point.X+r.Width {
