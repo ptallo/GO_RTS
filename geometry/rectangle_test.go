@@ -48,34 +48,38 @@ func Test_GivenRectangle_WhenDoesntContainPoint_ThenReturnsFalse(t *testing.T) {
 }
 
 func Test_GivenAdjacentRectangles_ThenIsAdjacentToReturnsTrue(t *testing.T) {
+	// RightOf
 	shouldBeAdjacent(
 		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 64.0, 64.0, 0.0),
+		geometry.NewRectangle(128.0, 64.0, 64.0, 0.0),
 		t,
 	)
 
+	// LeftOf
 	shouldBeAdjacent(
 		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 64.0, -64.0, 0.0),
+		geometry.NewRectangle(128.0, 64.0, -128.0, 0.0),
 		t,
 	)
 
+	// Above
 	shouldBeAdjacent(
 		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 64.0, 0.0, 64.0),
+		geometry.NewRectangle(64.0, 128.0, 0.0, -128.0),
 		t,
 	)
 
+	// Below
 	shouldBeAdjacent(
 		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 64.0, 0.0, -64.0),
+		geometry.NewRectangle(64.0, 128.0, 0.0, 64.0),
 		t,
 	)
 }
 
 func shouldBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
 	if !r1.IsAdjacentTo(r2) {
-		t.Errorf("rects %v and %v should be adjacent", r1, r2)
+		t.Errorf("rects %v and %v should be adjacent", r1.ToString(), r2.ToString())
 	}
 }
 

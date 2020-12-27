@@ -53,7 +53,7 @@ func Test_GivenDestinationNotInMap_WhenSettingDestination_ThenStopsAtEdge(t *tes
 	tryToMoveOutsideMap(t, geometry.NewPoint(200.0, 1200.0), geometry.NewPoint(200.0, 1000.0))
 }
 
-func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedDestination geometry.Point) {
+func tryToMoveOutsideMap(t *testing.T, goalDestination, expectedDestination geometry.Point) {
 	// Arrange
 	p := geometry.NewPositionComponent(geometry.NewRectangle(5.0, 5.0, 200.0, 200.0), 3.0)
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
@@ -71,19 +71,19 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination geometry.Point, expectedD
 func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T) {
 	// Arrange
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
-	pcs := []geometry.IPositionComponent{geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)}
-	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
+	pc := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)
+	mapRect := geometry.NewRectangle(1000.0, 1000.0, -500.0, -500.0)
 
 	// Act
 	goalDestination := geometry.NewPoint(15.0, 5.0)
-	p1.SetDestination(goalDestination, mapRect, pcs)
+	p1.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{pc})
 
 	for i := 0; i < 1000; i++ {
-		p1.MoveTowardsDestination(pcs)
+		p1.MoveTowardsDestination([]geometry.IPositionComponent{pc})
 	}
 
 	// Assert
-	if p1.GetPosition().Equals(goalDestination) || p1.GetRectangle().Intersects(pcs[0].GetRectangle()) {
+	if p1.GetPosition().Equals(goalDestination) || p1.GetRectangle().Intersects(pc.GetRectangle()) {
 		t.Error("shouldn't be able to move into un-pathable component")
 	}
 }

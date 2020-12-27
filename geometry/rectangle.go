@@ -54,11 +54,11 @@ func (r Rectangle) isBelow(r2 Rectangle) bool {
 }
 
 func (r Rectangle) isLeftOf(r2 Rectangle) bool {
-	return r.Point.X+r.Width == r2.Point.X && r.Point.Y == r2.Point.Y && r.Width == r2.Width
+	return r.Point.X+r.Width == r2.Point.X && r.Point.Y == r2.Point.Y && r.Height == r2.Height
 }
 
 func (r Rectangle) isRightOf(r2 Rectangle) bool {
-	return r.Point.X == r2.Point.X+r2.Width && r.Point.Y == r2.Point.Y && r.Width == r2.Width
+	return r.Point.X == r2.Point.X+r2.Width && r.Point.Y == r2.Point.Y && r.Height == r2.Height
 }
 
 // Intersects checks if one rectangle intersects another rectangle
@@ -75,6 +75,14 @@ func (r Rectangle) Intersects(r2 Rectangle) bool {
 // Contains checks to see if a rectangle contains a point
 func (r Rectangle) Contains(p Point) bool {
 	return r.Point.X <= p.X && r.Point.X+r.Width >= p.X && r.Point.Y <= p.Y && r.Point.Y+r.Height >= p.Y
+}
+
+// Center returns a point representing the center of the rectangle
+func (r Rectangle) Center() Point {
+	return NewPoint(
+		r.Point.X+(r.Width/2),
+		r.Point.Y+(r.Height/2),
+	)
 }
 
 // ToString prints a rectangle to a string in a nice way

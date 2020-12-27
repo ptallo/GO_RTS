@@ -5,7 +5,19 @@ import (
 	"testing"
 )
 
-func Test_GivenPositionComponents_ThenGeneratesGraph(t *testing.T) {
+func Test_GivenNoCollidables_ThenReturnsDest(t *testing.T) {
+	graph := geometry.NewGraph([]geometry.IPositionComponent{}, geometry.NewRectangle(256.0, 256.0, 0.0, 0.0))
+	start := geometry.NewPoint(10.0, 10.0)
+	destination := geometry.NewPoint(100.0, 100.0)
+
+	path := graph.PathFrom(start, destination)
+
+	if len(path) != 1 && !path[0].Contains(destination) {
+		t.Errorf("path should be length 1 and have goal destination %v but instead has destination %v", destination, path[0])
+	}
+}
+
+func Test_GivenGraph_WhenPathing_ThenGeneratesPoints(t *testing.T) {
 	// Arrange
 	pcs := []geometry.IPositionComponent{
 		geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 0.0), 0.0),
@@ -13,28 +25,26 @@ func Test_GivenPositionComponents_ThenGeneratesGraph(t *testing.T) {
 		geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 128.0), 0.0),
 	}
 	mapRect := geometry.NewRectangle(256.0, 256.0, 0.0, 0.0)
-
-	// Act
 	graph := geometry.NewGraph(pcs, mapRect)
 
+	start := geometry.NewPoint(10.0, 10.0)
+	dest := geometry.NewPoint(200.0, 10.0)
+
+	// Act
+	nodesToDestination := graph.PathFrom(start, dest)
+
 	// Assert
-	if len(graph.AdjacencyList) != 9 {
-		t.Errorf("should construct a graph with 9 nodes")
+	if len(nodesToDestination) != 9 {
+		t.Errorf("number of nodes to destination should be 8 but is %v", len(nodesToDestination))
 	}
 
-	for k, v := range graph.AdjacencyList {
-		checkRectInCollidableComponents(k, pcs, t)
-
-		if len(v) != 1 && len(v) != 2 {
-			t.Errorf("all elements should have 1 or 2 adjacent nodes")
-		}
+	lastNode := nodesToDestination[len(nodesToDestination)-1]
+	if !lastNode.Contains(dest) {
+		t.Error("The last node should contain the destination")
 	}
-}
 
-func checkRectInCollidableComponents(rect geometry.Rectangle, pcs []geometry.IPositionComponent, t *testing.T) {
-	for _, pc := range pcs {
-		if rect.Equals(pc.GetRectangle()) {
-			t.Errorf("Collidable components should not appear in map")
-		}
+	startNode := nodesToDestination[0]
+	if !startNode.Contains(start) {
+		t.Error("The first node should contain the start")
 	}
 }

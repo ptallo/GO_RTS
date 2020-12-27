@@ -8,28 +8,13 @@ type Graph struct {
 
 // NewGraph creates a graph with nodes based on the components and mapRect
 func NewGraph(components []IPositionComponent, mapRect Rectangle) Graph {
-	rects := generateNodes(components, mapRect)
+	xPoints, yPoints := generateXYDivisions(components, mapRect)
+	rects := makeRectsFromXYDivisions(xPoints, yPoints)
 	nonPcRects := filterCollidableRects(rects, components)
 	adjacencyList := constructAdjacencyList(nonPcRects)
 	return Graph{
 		AdjacencyList: adjacencyList,
 	}
-}
-
-func generateNodes(components []IPositionComponent, mapRect Rectangle) []Rectangle {
-	xPoints, yPoints := generateXYDivisions(components, mapRect)
-	rects := make([]Rectangle, 0)
-	for i := range xPoints[:len(xPoints)-1] {
-		for j := range yPoints[:len(yPoints)-1] {
-			rect := NewRectangleFromPoints(
-				NewPoint(xPoints[i], yPoints[j]),
-				NewPoint(xPoints[i+1], yPoints[j+1]),
-			)
-			rects = append(rects, rect)
-		}
-	}
-
-	return rects
 }
 
 func generateXYDivisions(components []IPositionComponent, mapRect Rectangle) ([]float64, []float64) {
@@ -54,6 +39,21 @@ func removeDuplicates(slice []float64) []float64 {
 		}
 	}
 	return slice
+}
+
+func makeRectsFromXYDivisions(xPoints, yPoints []float64) []Rectangle {
+	rects := make([]Rectangle, 0)
+	for i := range xPoints[:len(xPoints)-1] {
+		for j := range yPoints[:len(yPoints)-1] {
+			rect := NewRectangleFromPoints(
+				NewPoint(xPoints[i], yPoints[j]),
+				NewPoint(xPoints[i+1], yPoints[j+1]),
+			)
+			rects = append(rects, rect)
+		}
+	}
+
+	return rects
 }
 
 func filterCollidableRects(rects []Rectangle, components []IPositionComponent) []Rectangle {
@@ -87,4 +87,67 @@ func constructAdjacencyList(nodes []Rectangle) map[Rectangle][]Rectangle {
 		}
 	}
 	return adjacencyList
+}
+
+// PathFrom finds a set of points which will get the user from start to the destination
+func (g Graph) PathFrom(start, dest Point) []Rectangle {
+	nodes := make([]Rectangle, 0)
+	for k := range g.AdjacencyList {
+		nodes = append(nodes, k)
+	}
+
+	startNode := getNodeContainingPoint(start, nodes)
+	endNode := getNodeContainingPoint(dest, nodes)
+
+	queue := []Rectangle{startNode}
+	visited := make([]Rectangle, 0)
+	parent := make(map[Rectangle]Rectangle)
+
+	for !queue[0].Equals(endNode) {
+		currentNode := queue[0]
+		visited = append(visited, currentNode)
+		nodesToAdd := g.AdjacencyList[currentNode]
+		for _, n := range nodesToAdd {
+			if !isItemInList(n, visited) {
+				queue = append(queue, n)
+				parent[n] = currentNode
+			}
+		}
+		queue = queue[1:]
+	}
+
+	path := []Rectangle{endNode}
+	for !path[0].Equals(startNode) {
+		parentNode := parent[path[0]]
+		path = append([]Rectangle{parentNode}, path...)
+	}
+	return path
+}
+
+func isItemInList(rect Rectangle, rects []Rectangle) bool {
+	for _, r := range rects {
+		if r.Equals(rect) {
+			return true
+		}
+	}
+	return false
+}
+
+func getNodeContainingPoint(point Point, nodes []Rectangle) Rectangle {
+	for _, n := range nodes {
+		if n.Contains(point) {
+			return n
+		}
+	}
+	return Rectangle{}
+}
+
+// DoesGraphContainPoint returns true if the point is in the graph else false
+func (g Graph) DoesGraphContainPoint(p Point) bool {
+	for k := range g.AdjacencyList {
+		if k.Contains(p) {
+			return true
+		}
+	}
+	return false
 }

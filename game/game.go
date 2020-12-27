@@ -93,7 +93,13 @@ func (g *Game) setUnitsDestination(p *geometry.Point) {
 	mapRect := GetMapRectangle(g.tiles)
 
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(*p, mapRect, []geometry.IPositionComponent{})
+		collidables := make([]geometry.IPositionComponent, 0)
+		for _, t := range g.tiles {
+			if !t.IsPathable {
+				collidables = append(collidables, t.PositionComponent)
+			}
+		}
+		u.PositionComponent.SetDestination(*p, mapRect, collidables)
 	}
 }
 
