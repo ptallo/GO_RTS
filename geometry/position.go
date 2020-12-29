@@ -145,12 +145,14 @@ func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionCompon
 		p.UpdateCurrentDestination()
 	}
 
-	newTranslationVector := *p.getTranslationVector()
-	p.Rectangle.Point.Translate(newTranslationVector)
+	p.Rectangle.Point.Translate(*p.getTranslationVector())
 
-	if willCollide(p, collidables) {
-		p.Rectangle.Point.Translate(newTranslationVector.Inverse())
+	avgPoint := NewPoint(0.0, 0.0)
+	for _, c := range p.Collisions(collidables) {
+		vecAway := c.GetRectangle().Center().To(p.GetRectangle().Center()).Unit().Scale(p.Speed * 1.5)
+		avgPoint.Translate(vecAway)
 	}
+	p.Rectangle.Point.Translate(avgPoint)
 }
 
 func (p *PositionComponent) getTranslationVector() *Point {
@@ -165,11 +167,13 @@ func (p *PositionComponent) getTranslationVector() *Point {
 	return &returnPoint
 }
 
-func willCollide(pc IPositionComponent, others []IPositionComponent) bool {
-	for _, o := range others {
-		if o.GetRectangle().Intersects(pc.GetRectangle()) {
-			return true
+// Collisions returns all position components from pcs which collide with p
+func (p *PositionComponent) Collisions(pcs []IPositionComponent) []IPositionComponent {
+	collisions := make([]IPositionComponent, 0)
+	for _, pc := range pcs {
+		if pc.GetRectangle().Intersects(p.GetRectangle()) {
+			collisions = append(collisions, pc)
 		}
 	}
-	return false
+	return collisions
 }

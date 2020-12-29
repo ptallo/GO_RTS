@@ -81,6 +81,14 @@ func (r Rectangle) Contains(p Point) bool {
 	return r.Point.X <= p.X && r.Point.X+r.Width >= p.X && r.Point.Y <= p.Y && r.Point.Y+r.Height >= p.Y
 }
 
+// Center returns the point describing the center of the rectangle
+func (r Rectangle) Center() Point {
+	return NewPoint(
+		r.Point.X+r.Width/2,
+		r.Point.Y+r.Height/2,
+	)
+}
+
 // ToString prints a rectangle to a string in a nice way
 func (r Rectangle) ToString() string {
 	return fmt.Sprintf("%g %g %v", r.Width, r.Height, r.Point)

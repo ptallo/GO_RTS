@@ -75,7 +75,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, -500.0, -500.0)
 
 	// Act
-	goalDestination := geometry.NewPoint(15.0, 5.0)
+	goalDestination := geometry.NewPoint(15.0, 0.0)
 	p1.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{pc})
 
 	for i := 0; i < 1000; i++ {
