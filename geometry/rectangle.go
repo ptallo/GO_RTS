@@ -39,25 +39,29 @@ func (r Rectangle) Equals(r2 Rectangle) bool {
 
 // IsAdjacentTo checkts to see if this rect exists next to another in 2d space
 func (r Rectangle) IsAdjacentTo(r2 Rectangle) bool {
-	return r.isAbove(r2) ||
-		r.isBelow(r2) ||
-		r.isLeftOf(r2) ||
-		r.isRightOf(r2)
+	return r.IsTopAdjacent(r2) ||
+		r.IsBottomAdjacent(r2) ||
+		r.IsLeftAdjacent(r2) ||
+		r.IsRightAdjacent(r2)
 }
 
-func (r Rectangle) isAbove(r2 Rectangle) bool {
+// IsTopAdjacent returns true if r is above r2 else false
+func (r Rectangle) IsTopAdjacent(r2 Rectangle) bool {
 	return r.Point.Y+r.Height == r2.Point.Y && r.Point.X == r2.Point.X && r.Width == r2.Width
 }
 
-func (r Rectangle) isBelow(r2 Rectangle) bool {
+// IsBottomAdjacent returns true if r is below r2 else false
+func (r Rectangle) IsBottomAdjacent(r2 Rectangle) bool {
 	return r.Point.Y == r2.Point.Y+r2.Height && r.Point.X == r2.Point.X && r.Width == r2.Width
 }
 
-func (r Rectangle) isLeftOf(r2 Rectangle) bool {
+// IsLeftAdjacent returns true if r is left of r2 else false
+func (r Rectangle) IsLeftAdjacent(r2 Rectangle) bool {
 	return r.Point.X+r.Width == r2.Point.X && r.Point.Y == r2.Point.Y && r.Height == r2.Height
 }
 
-func (r Rectangle) isRightOf(r2 Rectangle) bool {
+// IsRightAdjacent returns true if r is right of r2 else false
+func (r Rectangle) IsRightAdjacent(r2 Rectangle) bool {
 	return r.Point.X == r2.Point.X+r2.Width && r.Point.Y == r2.Point.Y && r.Height == r2.Height
 }
 
@@ -77,27 +81,7 @@ func (r Rectangle) Contains(p Point) bool {
 	return r.Point.X <= p.X && r.Point.X+r.Width >= p.X && r.Point.Y <= p.Y && r.Point.Y+r.Height >= p.Y
 }
 
-// Center returns a point representing the center of the rectangle
-func (r Rectangle) Center() Point {
-	return NewPoint(
-		r.Point.X+(r.Width/2),
-		r.Point.Y+(r.Height/2),
-	)
-}
-
 // ToString prints a rectangle to a string in a nice way
 func (r Rectangle) ToString() string {
 	return fmt.Sprintf("%g %g %v", r.Width, r.Height, r.Point)
-}
-
-// GetCorners returns the four-corners of a rectangle
-func (r Rectangle) GetCorners() []Point {
-	x := r.Point.X
-	y := r.Point.Y
-	return []Point{
-		NewPoint(x, y),
-		NewPoint(x+r.Width, y),
-		NewPoint(x, y+r.Height),
-		NewPoint(x+r.Width, y+r.Height),
-	}
 }

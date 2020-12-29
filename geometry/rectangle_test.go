@@ -47,39 +47,29 @@ func Test_GivenRectangle_WhenDoesntContainPoint_ThenReturnsFalse(t *testing.T) {
 	}
 }
 
-func Test_GivenAdjacentRectangles_ThenIsAdjacentToReturnsTrue(t *testing.T) {
-	// RightOf
-	shouldBeAdjacent(
-		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(128.0, 64.0, 64.0, 0.0),
-		t,
-	)
+func Test_GivenLeftRightRectangles_ThenIdentifiesCorrectly(t *testing.T) {
+	r1 := geometry.NewRectangle(10.0, 10.0, 0.0, 0.0)
+	r2 := geometry.NewRectangle(10.0, 10.0, 10.0, 0.0)
 
-	// LeftOf
-	shouldBeAdjacent(
-		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(128.0, 64.0, -128.0, 0.0),
-		t,
-	)
+	if !r1.IsLeftAdjacent(r2) {
+		t.Errorf("%v should be considered left of %v", r1.ToString(), r2.ToString())
+	}
 
-	// Above
-	shouldBeAdjacent(
-		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 128.0, 0.0, -128.0),
-		t,
-	)
-
-	// Below
-	shouldBeAdjacent(
-		geometry.NewRectangle(64.0, 64.0, 0.0, 0.0),
-		geometry.NewRectangle(64.0, 128.0, 0.0, 64.0),
-		t,
-	)
+	if !r2.IsRightAdjacent(r1) {
+		t.Errorf("%v should be considered right of %v", r2.ToString(), r1.ToString())
+	}
 }
 
-func shouldBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
-	if !r1.IsAdjacentTo(r2) {
-		t.Errorf("rects %v and %v should be adjacent", r1.ToString(), r2.ToString())
+func Test_GivenUpDownRectangles_ThenIdentifiesCorrectly(t *testing.T) {
+	r1 := geometry.NewRectangle(10.0, 10.0, 0.0, 0.0)
+	r2 := geometry.NewRectangle(10.0, 10.0, 0.0, 10.0)
+
+	if !r1.IsTopAdjacent(r2) {
+		t.Errorf("%v should be considered above of %v", r1.ToString(), r2.ToString())
+	}
+
+	if !r2.IsBottomAdjacent(r1) {
+		t.Errorf("%v should be considered below of %v", r2.ToString(), r1.ToString())
 	}
 }
 
@@ -113,4 +103,8 @@ func shouldNotBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
 	if r1.IsAdjacentTo(r2) {
 		t.Errorf("rects %v and %v should not be adjacent", r1.ToString(), r2.ToString())
 	}
+}
+
+func Test_GivenThreeAdjacentRects_ThenIdentifiesShape(t *testing.T) {
+
 }

@@ -48,20 +48,77 @@ func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, co
 		return
 	}
 
-	nodesToDestination := graph.PathFrom(*p.Rectangle.Point, goalDest)
-	destinations := make([]Point, 0)
-	for _, n := range nodesToDestination {
-		if n.Contains(goalDest) {
-			destinations = append(destinations, goalDest)
-		} else {
-			destinations = append(destinations, n.Center())
-		}
-	}
+	nodes := graph.PathFrom(*p.Rectangle.Point, goalDest)
+	destinations := p.getDestinationPoints(nodes, goalDest)
 
 	if len(destinations) > 0 {
 		p.Destination = &destinations[0]
 		p.Destinations = destinations[1:]
 	}
+}
+
+func (p *PositionComponent) getDestinationPoints(nodes []Rectangle, goalDest Point) []Point {
+	destinations := make([]Point, 0)
+	for i := range nodes {
+		if nodes[i].Contains(goalDest) {
+			destinations = append(destinations, goalDest)
+		} else if i > 0 {
+			destinations = append(destinations, p.getPointFromNodes(nodes[i-1], nodes[i], nodes[i+1]))
+		}
+	}
+	return destinations
+}
+
+func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode Rectangle) Point {
+	leftX := nextNode.Point.X
+	middleX := nextNode.Point.X + (nextNode.Width+p.GetRectangle().Width)/2
+	rightX := nextNode.Point.X + nextNode.Width - p.GetRectangle().Width
+
+	topY := nextNode.Point.Y
+	middleY := nextNode.Point.Y + (nextNode.Height+p.GetRectangle().Height)/2
+	bottomY := nextNode.Point.Y + nextNode.Height - p.GetRectangle().Height
+
+	if currentNode.IsTopAdjacent(nextNode) {
+		if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(middleX, topY)
+		} else if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(leftX, topY)
+		} else if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(rightX, topY)
+		}
+	}
+
+	if currentNode.IsBottomAdjacent(nextNode) {
+		if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(middleX, bottomY)
+		} else if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(leftX, bottomY)
+		} else if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(rightX, bottomY)
+		}
+	}
+
+	if currentNode.IsLeftAdjacent(nextNode) {
+		if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(leftX, middleY)
+		} else if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(leftX, topY)
+		} else if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(leftX, bottomY)
+		}
+	}
+
+	if currentNode.IsRightAdjacent(nextNode) {
+		if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(rightX, middleY)
+		} else if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(rightX, topY)
+		} else if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(rightX, bottomY)
+		}
+	}
+
+	return Point{}
 }
 
 func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
@@ -95,13 +152,13 @@ func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionCompon
 	newTranslationVector := *p.getTranslationVector()
 	p.Rectangle.Point.Translate(newTranslationVector)
 
+	if willCollide(p, collidables) {
+		p.Rectangle.Point.Translate(newTranslationVector.Inverse())
+	}
+
 	if p.Rectangle.Point.Equals(*p.Destination) && len(p.Destinations) > 0 {
 		p.Destination = &p.Destinations[0]
 		p.Destinations = p.Destinations[1:]
-	}
-
-	if willCollide(p, collidables) {
-		p.Rectangle.Point.Translate(newTranslationVector.Inverse())
 	}
 }
 
