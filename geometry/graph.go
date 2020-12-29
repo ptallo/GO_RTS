@@ -96,6 +96,10 @@ func (g Graph) PathFrom(start, dest Point) []Rectangle {
 		nodes = append(nodes, k)
 	}
 
+	if !g.Contains(dest) {
+		return []Rectangle{}
+	}
+
 	startNode := getNodeContainingPoint(start, nodes)
 	endNode := getNodeContainingPoint(dest, nodes)
 
@@ -142,8 +146,8 @@ func getNodeContainingPoint(point Point, nodes []Rectangle) Rectangle {
 	return Rectangle{}
 }
 
-// DoesGraphContainPoint returns true if the point is in the graph else false
-func (g Graph) DoesGraphContainPoint(p Point) bool {
+// Contains returns true if the point is in the graph else false
+func (g Graph) Contains(p Point) bool {
 	for k := range g.AdjacencyList {
 		if k.Contains(p) {
 			return true

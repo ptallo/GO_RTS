@@ -62,7 +62,7 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination, expectedDestination geom
 	p.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{})
 
 	// Assert
-	actualDestination := *p.Destination
+	actualDestination := *p.GoalDestination
 	if !expectedDestination.Equals(actualDestination) {
 		t.Errorf("actual destination %v should equal expected destinaton %v", actualDestination, expectedDestination)
 	}
@@ -98,7 +98,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenPathsAround(t *testing.T) {
 	p1.SetDestination(goalDestination, mapRect, pcs)
 
 	for i := 0; i < 1000; i++ {
-		p1.MoveTowardsDestination(pcs)
+		p1.MoveTowardsDestination([]geometry.IPositionComponent{})
 	}
 
 	// Assert
