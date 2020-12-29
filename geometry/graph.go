@@ -2,6 +2,7 @@ package geometry
 
 import "sort"
 
+// Graph is a structure containing an adjacency list
 type Graph struct {
 	AdjacencyList map[Rectangle][]Rectangle
 }
