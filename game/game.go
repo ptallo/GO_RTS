@@ -23,7 +23,7 @@ func NewGame() Game {
 		container: c,
 		tiles:     NewMapFromFile(c.GetSpriteSheetLibrary(), c.GetCamera(), "./assets/maps/map1.txt"),
 		units: []*Unit{
-			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 100.0)),
+			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 200.0)),
 			NewUnit(c.GetSpriteSheetLibrary(), c.GetCamera(), geometry.NewPoint(100.0, 300.0)),
 		},
 		selectedUnits: []*Unit{},
@@ -93,7 +93,13 @@ func (g *Game) setUnitsDestination(p *geometry.Point) {
 	mapRect := GetMapRectangle(g.tiles)
 
 	for _, u := range g.selectedUnits {
-		u.PositionComponent.SetDestination(*p, mapRect, []geometry.IPositionComponent{})
+		collidables := make([]geometry.IPositionComponent, 0)
+		for _, t := range g.tiles {
+			if !t.IsPathable {
+				collidables = append(collidables, t.PositionComponent)
+			}
+		}
+		u.PositionComponent.SetDestination(*p, mapRect, collidables)
 	}
 }
 

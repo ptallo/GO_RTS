@@ -101,6 +101,7 @@ func GetMapRectangle(tiles []*Tile) geometry.Rectangle {
 	)
 }
 
+// ShrinkMapRectangle shrinks the mapRect by the percentage
 func ShrinkMapRectangle(mapRect geometry.Rectangle, percentage float64) geometry.Rectangle {
 	if percentage > 1 {
 		panic(fmt.Sprintf("shrink percentage %v should be less than 1", percentage))

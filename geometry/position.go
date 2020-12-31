@@ -11,17 +11,21 @@ type IPositionComponent interface {
 // NewPositionComponent is a shortcut to create a PositionComponent
 func NewPositionComponent(rect Rectangle, speed float64) *PositionComponent {
 	return &PositionComponent{
-		Rectangle:   &rect,
-		Destination: rect.Point,
-		Speed:       speed,
+		Rectangle:          &rect,
+		CurrentDestination: rect.Point,
+		GoalDestination:    rect.Point,
+		Nodes:              []Rectangle{},
+		Speed:              speed,
 	}
 }
 
 // PositionComponent is a struct which implements the IPositionComponent
 type PositionComponent struct {
-	Rectangle   *Rectangle
-	Destination *Point
-	Speed       float64
+	Rectangle          *Rectangle
+	CurrentDestination *Point
+	GoalDestination    *Point
+	Nodes              []Rectangle
+	Speed              float64
 }
 
 // GetPosition returns the current position of the PositionComponent
@@ -35,13 +39,78 @@ func (p *PositionComponent) GetRectangle() Rectangle {
 }
 
 // SetDestination sets the destination of the PositionComponent
-func (p *PositionComponent) SetDestination(dest Point, mapRect Rectangle, collidables []IPositionComponent) {
-	if mapRect.Contains(dest) {
-		p.Destination = &dest
-	} else {
-		newDest := getInMapDestination(dest, mapRect)
-		p.Destination = &newDest
+func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, collidables []IPositionComponent) {
+	if !mapRect.Contains(goalDest) {
+		goalDest = getInMapDestination(goalDest, mapRect)
 	}
+	p.GoalDestination = &goalDest
+
+	graph := NewGraph(collidables, mapRect)
+	p.Nodes = graph.PathFrom(*p.Rectangle.Point, goalDest)
+	p.UpdateCurrentDestination()
+}
+
+// UpdateCurrentDestination will change the current destination based on the p.Nodes and p.GoalDestination
+func (p *PositionComponent) UpdateCurrentDestination() {
+	if len(p.Nodes) >= 3 {
+		currentDdestination := p.getPointFromNodes(p.Nodes[0], p.Nodes[1], p.Nodes[2])
+		p.CurrentDestination = &currentDdestination
+		p.Nodes = p.Nodes[1:]
+	} else {
+		p.CurrentDestination = p.GoalDestination
+	}
+}
+
+func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode Rectangle) Point {
+	leftX := nextNode.Point.X
+	middleX := p.GetPosition().X
+	rightX := nextNode.Point.X + nextNode.Width - p.GetRectangle().Width
+
+	topY := nextNode.Point.Y
+	middleY := p.GetPosition().Y
+	bottomY := nextNode.Point.Y + nextNode.Height - p.GetRectangle().Height
+
+	if currentNode.IsTopAdjacent(nextNode) {
+		if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(middleX, topY)
+		} else if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(rightX, topY)
+		} else if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(leftX, topY)
+		}
+	}
+
+	if currentNode.IsBottomAdjacent(nextNode) {
+		if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(middleX, bottomY)
+		} else if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(rightX, bottomY)
+		} else if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(leftX, bottomY)
+		}
+	}
+
+	if currentNode.IsLeftAdjacent(nextNode) {
+		if nextNode.IsLeftAdjacent(thirdNode) {
+			return NewPoint(leftX, middleY)
+		} else if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(leftX, topY)
+		} else if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(leftX, bottomY)
+		}
+	}
+
+	if currentNode.IsRightAdjacent(nextNode) {
+		if nextNode.IsRightAdjacent(thirdNode) {
+			return NewPoint(rightX, middleY)
+		} else if nextNode.IsBottomAdjacent(thirdNode) {
+			return NewPoint(rightX, topY)
+		} else if nextNode.IsTopAdjacent(thirdNode) {
+			return NewPoint(rightX, bottomY)
+		}
+	}
+
+	return Point{}
 }
 
 func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
@@ -72,31 +141,39 @@ func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
 
 // MoveTowardsDestination defines how to move towards the destination
 func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionComponent) {
-	newTranslationVector := *p.getTranslationVector()
-	p.Rectangle.Point.Translate(newTranslationVector)
-
-	if willCollide(p, collidables) {
-		p.Rectangle.Point.Translate(newTranslationVector.Inverse())
+	if p.Rectangle.Point.Equals(*p.CurrentDestination) && !p.CurrentDestination.Equals(*p.GoalDestination) {
+		p.UpdateCurrentDestination()
 	}
+
+	p.Rectangle.Point.Translate(*p.getTranslationVector())
+
+	avgPoint := NewPoint(0.0, 0.0)
+	for _, c := range p.Collisions(collidables) {
+		vecAway := c.GetRectangle().Center().To(p.GetRectangle().Center()).Unit().Scale(p.Speed * 1.5)
+		avgPoint.Translate(vecAway)
+	}
+	p.Rectangle.Point.Translate(avgPoint)
 }
 
 func (p *PositionComponent) getTranslationVector() *Point {
 	var returnPoint Point
-	if p.Rectangle.Point.DistanceFrom(*p.Destination) == 0.0 {
+	if p.Rectangle.Point.DistanceFrom(*p.CurrentDestination) == 0.0 {
 		returnPoint = NewPoint(0.0, 0.0)
-	} else if p.Rectangle.Point.DistanceFrom(*p.Destination) < p.Speed {
-		returnPoint = p.Rectangle.Point.To(*p.Destination)
+	} else if p.Rectangle.Point.DistanceFrom(*p.CurrentDestination) < p.Speed {
+		returnPoint = p.Rectangle.Point.To(*p.CurrentDestination)
 	} else {
-		returnPoint = p.Rectangle.Point.To(*p.Destination).Unit().Scale(p.Speed)
+		returnPoint = p.Rectangle.Point.To(*p.CurrentDestination).Unit().Scale(p.Speed)
 	}
 	return &returnPoint
 }
 
-func willCollide(pc IPositionComponent, others []IPositionComponent) bool {
-	for _, o := range others {
-		if o.GetRectangle().Intersects(pc.GetRectangle()) {
-			return true
+// Collisions returns all position components from pcs which collide with p
+func (p *PositionComponent) Collisions(pcs []IPositionComponent) []IPositionComponent {
+	collisions := make([]IPositionComponent, 0)
+	for _, pc := range pcs {
+		if pc.GetRectangle().Intersects(p.GetRectangle()) {
+			collisions = append(collisions, pc)
 		}
 	}
-	return false
+	return collisions
 }

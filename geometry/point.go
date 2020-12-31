@@ -18,10 +18,15 @@ func NewPoint(x, y float64) Point {
 	}
 }
 
-// Translate moves a point given another point
+// Translate moves a point given another point in-place
 func (p *Point) Translate(point Point) {
 	p.X += point.X
 	p.Y += point.Y
+}
+
+// Move returns a new point moved by the value p
+func (p Point) Move(p1 Point) Point {
+	return NewPoint(p.X+p1.X, p.Y+p1.Y)
 }
 
 // Inverse gives the inverse of a given point
