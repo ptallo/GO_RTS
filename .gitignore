@@ -19,3 +19,4 @@ vendor/
 
 # mockgen folder
 mocks/
+__debug_bin
