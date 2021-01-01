@@ -103,7 +103,10 @@ func (g Graph) PathFrom(start, dest Point) []Rectangle {
 
 	startNode := getNodeContainingPoint(start, nodes)
 	endNode := getNodeContainingPoint(dest, nodes)
+	return g.aStarSearch(startNode, endNode)
+}
 
+func (g Graph) aStarSearch(startNode, endNode Rectangle) []Rectangle {
 	queue := []Rectangle{startNode}
 	visited := make([]Rectangle, 0)
 	parent := make(map[Rectangle]Rectangle)

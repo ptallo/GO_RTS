@@ -46,21 +46,6 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) getCollidableComponents(unit *Unit) []geometry.IPositionComponent {
-	otherUnits := make([]geometry.IPositionComponent, 0)
-	for _, u := range g.units {
-		if u != unit {
-			otherUnits = append(otherUnits, u.PositionComponent)
-		}
-	}
-	for _, tile := range g.tiles {
-		if !tile.IsPathable {
-			otherUnits = append(otherUnits, tile.PositionComponent)
-		}
-	}
-	return otherUnits
-}
-
 func (g *Game) listenForEvents() {
 	select {
 	case rect := <-g.container.GetEventHandler().LeftButtonReleasedListener:
@@ -77,6 +62,21 @@ func (g *Game) listenForEvents() {
 		g.setUnitsDestination(&point)
 	default:
 	}
+}
+
+func (g *Game) getCollidableComponents(unit *Unit) []geometry.IPositionComponent {
+	otherUnits := make([]geometry.IPositionComponent, 0)
+	for _, u := range g.units {
+		if u != unit {
+			otherUnits = append(otherUnits, u.PositionComponent)
+		}
+	}
+	for _, tile := range g.tiles {
+		if !tile.IsPathable {
+			otherUnits = append(otherUnits, tile.PositionComponent)
+		}
+	}
+	return otherUnits
 }
 
 func selectUnits(selectionRect geometry.Rectangle, camera render.ICamera, units []*Unit) []*Unit {

@@ -104,7 +104,3 @@ func shouldNotBeAdjacent(r1, r2 geometry.Rectangle, t *testing.T) {
 		t.Errorf("rects %v and %v should not be adjacent", r1.ToString(), r2.ToString())
 	}
 }
-
-func Test_GivenThreeAdjacentRects_ThenIdentifiesShape(t *testing.T) {
-
-}
