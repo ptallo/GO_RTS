@@ -1,11 +1,10 @@
 package render
 
 import (
-	"go_rts/geometry"
+	"go_rts/types/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
-
 
 // ICamera is the interface which is implemented to provide camera usage
 type ICamera interface {

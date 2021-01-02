@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go_rts/core"
+	"go_rts/types/core"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

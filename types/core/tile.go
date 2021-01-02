@@ -3,8 +3,8 @@ package core
 import (
 	"bufio"
 	"fmt"
-	"go_rts/geometry"
-	"go_rts/render"
+	"go_rts/client/render"
+	"go_rts/types/geometry"
 	"os"
 	"strings"
 )

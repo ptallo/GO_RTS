@@ -1,8 +1,8 @@
 package core
 
 import (
-	"go_rts/geometry"
-	"go_rts/render"
+	"go_rts/client/render"
+	"go_rts/types/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
