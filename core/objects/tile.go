@@ -2,8 +2,8 @@ package objects
 
 import (
 	"bufio"
-	"go_rts/types/geometry"
-	"go_rts/types/render"
+	"go_rts/core/geometry"
+	"go_rts/core/render"
 	"os"
 	"strings"
 )

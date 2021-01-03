@@ -1,9 +1,9 @@
 package core
 
 import (
-	"go_rts/types/geometry"
-	"go_rts/types/input"
-	"go_rts/types/render"
+	"go_rts/core/geometry"
+	"go_rts/core/input"
+	"go_rts/core/render"
 )
 
 // Container is an object which holds objects for the game

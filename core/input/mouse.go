@@ -1,7 +1,7 @@
 package input
 
 import (
-	"go_rts/types/geometry"
+	"go_rts/core/geometry"
 	"image/color"
 
 	"github.com/ethereum/go-ethereum/event"

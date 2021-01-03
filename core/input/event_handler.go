@@ -1,7 +1,7 @@
 package input
 
 import (
-	"go_rts/types/geometry"
+	"go_rts/core/geometry"
 )
 
 // EventHandler is a container for all event listeners in the game

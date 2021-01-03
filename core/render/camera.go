@@ -1,7 +1,7 @@
 package render
 
 import (
-	"go_rts/types/geometry"
+	"go_rts/core/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

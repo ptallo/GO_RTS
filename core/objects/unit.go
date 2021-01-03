@@ -1,8 +1,8 @@
 package objects
 
 import (
-	"go_rts/types/geometry"
-	"go_rts/types/render"
+	"go_rts/core/geometry"
+	"go_rts/core/render"
 )
 
 // Unit is an object describing a game unit
