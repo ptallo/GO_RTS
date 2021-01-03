@@ -24,8 +24,6 @@ func NewGame(width, height int) Game {
 		gameObjects: NewGameObjects(c),
 	}
 
-	game.container.GetEventHandler().Subscribe(game.container.GetMouse())
-
 	game.container.GetEventHandler().OnLBP(game.onLeftButtonPressed)
 	game.container.GetEventHandler().OnLBR(game.onLeftButtonReleased)
 	game.container.GetEventHandler().OnRBP(game.onRightButtonPressed)

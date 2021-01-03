@@ -6,6 +6,8 @@ import (
 
 // EventHandler is a container for all event listeners in the game
 type EventHandler struct {
+	mouse IMouse
+
 	LeftButtonPressedListener  chan geometry.Point
 	leftButtonPressedFunctions []func(geometry.Point)
 
@@ -17,19 +19,18 @@ type EventHandler struct {
 }
 
 // NewEventHandler initializes all relevent event listeners the game will need
-func NewEventHandler() *EventHandler {
-	return &EventHandler{
+func NewEventHandler(mouse IMouse) *EventHandler {
+	ev := &EventHandler{
 		LeftButtonPressedListener:  make(chan geometry.Point, 1),
 		LeftButtonReleasedListener: make(chan geometry.Rectangle, 1),
 		RightButtonPressedListener: make(chan geometry.Point, 1),
 	}
-}
 
-// Subscribe makes sure all the event listeners are subscribed to their corresponding events
-func (ev *EventHandler) Subscribe(mouse IMouse) {
 	mouse.LeftButtonPressedEvent().Subscribe(ev.LeftButtonPressedListener)
 	mouse.LeftButtonReleasedEvent().Subscribe(ev.LeftButtonReleasedListener)
 	mouse.RightButtonPressedEvent().Subscribe(ev.RightButtonPressedListener)
+
+	return ev
 }
 
 // Listen checks for all events and fires the related functions when they fire

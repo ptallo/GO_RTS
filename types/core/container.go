@@ -57,7 +57,7 @@ func (c *Container) GetMouse() IMouse {
 // GetEventHandler will lazy-load a singleton EventHandler
 func (c *Container) GetEventHandler() *EventHandler {
 	if c.eventHandler == nil {
-		c.eventHandler = NewEventHandler()
+		c.eventHandler = NewEventHandler(c.GetMouse())
 	}
 	return c.eventHandler
 }
