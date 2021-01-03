@@ -9,7 +9,7 @@ import (
 // ICamera is the interface which is implemented to provide camera usage
 type ICamera interface {
 	DrawImage(*ebiten.Image, *ebiten.Image, *ebiten.DrawImageOptions)
-	GetCameraMovements() []geometry.Point
+	UpdateCameraPosition(float64, float64, geometry.Rectangle)
 	Translation() *geometry.Point
 }
 
@@ -33,8 +33,28 @@ func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOpti
 	screen.DrawImage(img, opts)
 }
 
-// GetCameraMovements will return how the camera should move given the current position of a mouse in relation to the window
-func (c *Camera) GetCameraMovements() []geometry.Point {
+// UpdateCameraPosition will update the camera position according to GetCameraMovements if the screen will still overlap the map
+func (c *Camera) UpdateCameraPosition(screenWidth, screenHeight float64, mapRect geometry.Rectangle) {
+	moves := c.getCameraMovements()
+	for _, move := range moves {
+		c.translation.Translate(move)
+	}
+
+	screenRect := geometry.NewRectangle(
+		screenWidth,
+		screenHeight,
+		c.translation.X,
+		c.translation.Y,
+	)
+
+	if !screenRect.Intersects(mapRect) {
+		for _, move := range moves {
+			c.translation.Translate(move)
+		}
+	}
+}
+
+func (c *Camera) getCameraMovements() []geometry.Point {
 	width, height := ebiten.WindowSize()
 
 	cursorX, cursorY := ebiten.CursorPosition()

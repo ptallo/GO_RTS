@@ -2,7 +2,6 @@ package core
 
 import (
 	"bufio"
-	"fmt"
 	"go_rts/client/render"
 	"go_rts/types/geometry"
 	"os"
@@ -101,19 +100,13 @@ func GetMapRectangle(tiles []*Tile) geometry.Rectangle {
 	)
 }
 
-// ShrinkMapRectangle shrinks the mapRect by the percentage
-func ShrinkMapRectangle(mapRect geometry.Rectangle, percentage float64) geometry.Rectangle {
-	if percentage > 1 {
-		panic(fmt.Sprintf("shrink percentage %v should be less than 1", percentage))
-	}
-
-	newWidth := mapRect.Width * percentage
-	newHeight := mapRect.Height * percentage
-
+// ShrinkMapRectangle shrinks the mapRect by the number of tiles given
+func ShrinkMapRectangle(mapRect geometry.Rectangle, numTiles int) geometry.Rectangle {
+	numTilesF := float64(numTiles)
 	return geometry.NewRectangle(
-		newWidth,
-		newHeight,
-		mapRect.Point.X+(mapRect.Width-newWidth)/2,
-		mapRect.Point.Y+(mapRect.Height-newHeight)/2,
+		mapRect.Width-(tileWidth*numTilesF),
+		mapRect.Height-(tileHeight*numTilesF),
+		mapRect.Point.X+(tileWidth*numTilesF/2),
+		mapRect.Point.Y+(tileHeight*numTilesF/2),
 	)
 }
