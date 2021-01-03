@@ -2,6 +2,7 @@ package core
 
 import (
 	"go_rts/types/geometry"
+	"go_rts/types/input"
 	"go_rts/types/render"
 )
 
@@ -9,8 +10,8 @@ import (
 type Container struct {
 	spriteSheetLibrary render.ISpriteSheetLibrary
 	camera             render.ICamera
-	mouse              IMouse
-	eventHandler       *EventHandler
+	mouse              input.IMouse
+	eventHandler       *input.EventHandler
 }
 
 // GetSpriteSheetLibrary will lazy-load a singleton SpriteSheetLibrary object
@@ -48,17 +49,17 @@ func (c *Container) GetCamera() render.ICamera {
 }
 
 // GetMouse will lazy-load a singleton mouse object
-func (c *Container) GetMouse() IMouse {
+func (c *Container) GetMouse() input.IMouse {
 	if c.mouse == nil {
-		c.mouse = NewMouse()
+		c.mouse = input.NewMouse()
 	}
 	return c.mouse
 }
 
 // GetEventHandler will lazy-load a singleton EventHandler
-func (c *Container) GetEventHandler() *EventHandler {
+func (c *Container) GetEventHandler() *input.EventHandler {
 	if c.eventHandler == nil {
-		c.eventHandler = NewEventHandler(c.GetMouse())
+		c.eventHandler = input.NewEventHandler(c.GetMouse())
 	}
 	return c.eventHandler
 }

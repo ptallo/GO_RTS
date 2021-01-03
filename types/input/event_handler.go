@@ -1,4 +1,4 @@
-package core
+package input
 
 import (
 	"go_rts/types/geometry"

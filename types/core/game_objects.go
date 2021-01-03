@@ -2,6 +2,7 @@ package core
 
 import (
 	"go_rts/types/geometry"
+	"go_rts/types/objects"
 	"go_rts/types/render"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -9,20 +10,20 @@ import (
 
 // GameObjects is a contianer for holding game information
 type GameObjects struct {
-	Tiles         []*Tile
-	Units         []*Unit
-	SelectedUnits []*Unit
+	Tiles         []*objects.Tile
+	Units         []*objects.Unit
+	SelectedUnits []*objects.Unit
 }
 
 // NewGameObjects returns a standard initialization of the gameobjects
 func NewGameObjects(container *Container) *GameObjects {
 	return &GameObjects{
-		Tiles: NewMapFromFile(container.GetSpriteSheetLibrary(), container.GetCamera(), "./assets/maps/map1.txt"),
-		Units: []*Unit{
-			NewUnit(container.GetSpriteSheetLibrary(), container.GetCamera(), geometry.NewPoint(100.0, 200.0)),
-			NewUnit(container.GetSpriteSheetLibrary(), container.GetCamera(), geometry.NewPoint(100.0, 300.0)),
+		Tiles: objects.NewMapFromFile(container.GetSpriteSheetLibrary(), container.GetCamera(), "./assets/maps/map1.txt"),
+		Units: []*objects.Unit{
+			objects.NewUnit(container.GetSpriteSheetLibrary(), container.GetCamera(), geometry.NewPoint(100.0, 200.0)),
+			objects.NewUnit(container.GetSpriteSheetLibrary(), container.GetCamera(), geometry.NewPoint(100.0, 300.0)),
 		},
-		SelectedUnits: []*Unit{},
+		SelectedUnits: []*objects.Unit{},
 	}
 }
 
@@ -46,7 +47,7 @@ func (g *GameObjects) Update() {
 
 // SetUnitsDestinations sets the destination of all g.SelectedUnits to the point p
 func (g *GameObjects) SetUnitsDestinations(p *geometry.Point) {
-	mapRect := GetMapRectangle(g.Tiles)
+	mapRect := objects.GetMapRectangle(g.Tiles)
 	collidables := g.getCollidableComponents()
 	for _, u := range g.SelectedUnits {
 		u.PositionComponent.SetDestination(*p, mapRect, collidables)
@@ -64,8 +65,8 @@ func (g *GameObjects) getCollidableComponents() []geometry.IPositionComponent {
 }
 
 // SelectUnits selects all g.Units which intersect with the selectionRect
-func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*Unit {
-	selectedUnits := make([]*Unit, 0)
+func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*objects.Unit {
+	selectedUnits := make([]*objects.Unit, 0)
 	for _, unit := range g.Units {
 		if selectionRect.Intersects(unit.PositionComponent.GetRectangle()) {
 			selectedUnits = append(selectedUnits, unit)

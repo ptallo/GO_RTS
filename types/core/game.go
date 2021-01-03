@@ -2,6 +2,7 @@ package core
 
 import (
 	"go_rts/types/geometry"
+	"go_rts/types/objects"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -24,27 +25,23 @@ func NewGame(width, height int) Game {
 		gameObjects: NewGameObjects(c),
 	}
 
-	game.container.GetEventHandler().OnLBP(game.onLeftButtonPressed)
-	game.container.GetEventHandler().OnLBR(game.onLeftButtonReleased)
-	game.container.GetEventHandler().OnRBP(game.onRightButtonPressed)
+	game.container.GetEventHandler().OnLBP(func(p geometry.Point) {
+		game.gameObjects.SelectedUnits = []*objects.Unit{}
+	})
+
+	game.container.GetEventHandler().OnLBR(func(r geometry.Rectangle) {
+		cameraTranslation := *game.container.GetCamera().Translation()
+		r.Point.Translate(cameraTranslation)
+		game.gameObjects.SelectedUnits = game.gameObjects.SelectUnits(r)
+	})
+
+	game.container.GetEventHandler().OnRBP(func(p geometry.Point) {
+		cameraTranslation := *game.container.GetCamera().Translation()
+		p.Translate(cameraTranslation)
+		game.gameObjects.SetUnitsDestinations(&p)
+	})
 
 	return game
-}
-
-func (g *Game) onLeftButtonPressed(p geometry.Point) {
-	g.gameObjects.SelectedUnits = []*Unit{}
-}
-
-func (g *Game) onLeftButtonReleased(r geometry.Rectangle) {
-	cameraTranslation := *g.container.GetCamera().Translation()
-	r.Point.Translate(cameraTranslation)
-	g.gameObjects.SelectedUnits = g.gameObjects.SelectUnits(r)
-}
-
-func (g *Game) onRightButtonPressed(p geometry.Point) {
-	cameraTranslation := *g.container.GetCamera().Translation()
-	p.Translate(cameraTranslation)
-	g.gameObjects.SetUnitsDestinations(&p)
 }
 
 // Update is used to update all the game logic
@@ -52,7 +49,7 @@ func (g *Game) Update() error {
 	g.container.GetCamera().UpdateCameraPosition(
 		float64(g.width),
 		float64(g.height),
-		ShrinkMapRectangle(GetMapRectangle(g.gameObjects.Tiles), 4),
+		objects.ShrinkMapRectangle(objects.GetMapRectangle(g.gameObjects.Tiles), 4),
 	)
 	g.container.GetMouse().Update()
 	g.container.GetEventHandler().Listen()
