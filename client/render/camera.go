@@ -6,30 +6,30 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// ICamera is the interface which is implemented to provide camera usage
-type ICamera interface {
-	DrawImage(*ebiten.Image, *ebiten.Image, *ebiten.DrawImageOptions)
-	UpdateCameraPosition(float64, float64, geometry.Rectangle)
-	Translation() *geometry.Point
-}
-
 // Camera is an object used to track how the screen has moved in a game
 type Camera struct {
+	ssl         ISpriteSheetLibrary
 	translation *geometry.Point
 	Speed       float64
 }
 
 // NewCamera is a shortcut to creating a Camera object
-func NewCamera(t *geometry.Point, s float64) ICamera {
+func NewCamera(ssl ISpriteSheetLibrary, t *geometry.Point, s float64) ICamera {
 	return &Camera{
+		ssl:         ssl,
 		translation: t,
 		Speed:       s,
 	}
 }
 
-// DrawImage draws an image on a screen adjusted for the cameras translation
-func (c *Camera) DrawImage(screen, img *ebiten.Image, opts *ebiten.DrawImageOptions) {
+// Draw draws an image on a screen adjusted for the cameras translation
+func (c *Camera) Draw(screen *ebiten.Image, renderComponent *RenderComponent, pointToDraw geometry.Point) {
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(pointToDraw.X, pointToDraw.Y)
 	opts.GeoM.Translate(-c.translation.X, -c.translation.Y)
+
+	img := c.ssl.GetSpriteSheet(renderComponent.name).GetImage()
+
 	screen.DrawImage(img, opts)
 }
 

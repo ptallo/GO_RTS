@@ -39,6 +39,7 @@ func (c *Container) GetCamera() render.ICamera {
 	p := geometry.NewPoint(0, 0)
 	if c.camera == nil {
 		c.camera = render.NewCamera(
+			c.GetSpriteSheetLibrary(),
 			&p,
 			5.0,
 		)

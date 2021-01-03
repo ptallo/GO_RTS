@@ -16,7 +16,7 @@ const (
 
 // Tile is an object describing a map tile
 type Tile struct {
-	RenderComponent   render.IRenderComponent
+	RenderComponent   *render.RenderComponent
 	PositionComponent geometry.IPositionComponent
 	IsPathable        bool
 }
@@ -56,7 +56,7 @@ func convertCharacterToTile(char string, ssl render.ISpriteSheetLibrary, camera 
 // NewTile is a shortcut for creating a Tile
 func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, isPathable bool, p geometry.Point) *Tile {
 	return &Tile{
-		RenderComponent:   render.NewRenderComponent(ssl, cam, name),
+		RenderComponent:   render.NewRenderComponent(name),
 		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(tileWidth, tileHeight, p.X, p.Y), 0.0),
 		IsPathable:        isPathable,
 	}

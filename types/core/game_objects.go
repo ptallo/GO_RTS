@@ -1,6 +1,7 @@
 package core
 
 import (
+	"go_rts/client/render"
 	"go_rts/types/geometry"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -26,13 +27,13 @@ func NewGameObjects(container *Container) *GameObjects {
 }
 
 // DrawGameObjects is responsible for drawing the images on the screen
-func (g *GameObjects) DrawGameObjects(screen *ebiten.Image) {
+func (g *GameObjects) DrawGameObjects(screen *ebiten.Image, camera render.ICamera) {
 	for _, tile := range g.Tiles {
-		tile.RenderComponent.Draw(screen, *tile.PositionComponent.GetPosition())
+		camera.Draw(screen, tile.RenderComponent, *tile.PositionComponent.GetPosition())
 	}
 
 	for _, unit := range g.Units {
-		unit.RenderComponent.Draw(screen, *unit.PositionComponent.GetPosition())
+		camera.Draw(screen, unit.RenderComponent, *unit.PositionComponent.GetPosition())
 	}
 }
 

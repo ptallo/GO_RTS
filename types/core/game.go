@@ -62,7 +62,7 @@ func (g *Game) Update() error {
 
 // Draw is used to draw any relevant images on the screen
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.gameObjects.DrawGameObjects(screen)
+	g.gameObjects.DrawGameObjects(screen, g.container.GetCamera())
 	g.container.GetMouse().Draw(screen)
 }
 

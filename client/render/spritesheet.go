@@ -9,12 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-
-// ISpriteSheetLibrary is an interface which defines a central store for sprite sheets
-type ISpriteSheetLibrary interface {
-	GetSpriteSheet(string) *SpriteSheet
-}
-
 // SpriteSheetLibrary is a wrapper around a map[string]*SpriteSheet
 type SpriteSheetLibrary struct {
 	Library map[string]*SpriteSheet
