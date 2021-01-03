@@ -14,7 +14,7 @@ func NewPositionComponent(rect Rectangle, speed float64) *PositionComponent {
 		Rectangle:          &rect,
 		CurrentDestination: rect.Point,
 		GoalDestination:    rect.Point,
-		Nodes:              []Rectangle{},
+		NodesToVisit:       []Rectangle{},
 		Speed:              speed,
 	}
 }
@@ -24,7 +24,7 @@ type PositionComponent struct {
 	Rectangle          *Rectangle
 	CurrentDestination *Point
 	GoalDestination    *Point
-	Nodes              []Rectangle
+	NodesToVisit       []Rectangle
 	Speed              float64
 }
 
@@ -46,16 +46,16 @@ func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, co
 	p.GoalDestination = &goalDest
 
 	graph := NewGraph(collidables, mapRect)
-	p.Nodes = graph.PathFrom(*p.Rectangle.Point, goalDest)
+	p.NodesToVisit = graph.PathFrom(*p.Rectangle.Point, goalDest)
 	p.UpdateCurrentDestination()
 }
 
-// UpdateCurrentDestination will change the current destination based on the p.Nodes and p.GoalDestination
+// UpdateCurrentDestination will change the current destination based on the p.NodesToVisit and p.GoalDestination
 func (p *PositionComponent) UpdateCurrentDestination() {
-	if len(p.Nodes) >= 3 {
-		currentDdestination := p.getPointFromNodes(p.Nodes[0], p.Nodes[1], p.Nodes[2])
+	if len(p.NodesToVisit) >= 3 {
+		currentDdestination := p.getPointFromNodes(p.NodesToVisit[0], p.NodesToVisit[1], p.NodesToVisit[2])
 		p.CurrentDestination = &currentDdestination
-		p.Nodes = p.Nodes[1:]
+		p.NodesToVisit = p.NodesToVisit[1:]
 	} else {
 		p.CurrentDestination = p.GoalDestination
 	}

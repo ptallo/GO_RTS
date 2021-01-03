@@ -2,12 +2,12 @@ package render
 
 // RenderComponent implements the IRenderComponent interface
 type RenderComponent struct {
-	name string
+	Name string
 }
 
 // NewRenderComponent creates a IRenderComponent object
-func NewRenderComponent(name string) *RenderComponent {
+func NewRenderComponent(Name string) *RenderComponent {
 	return &RenderComponent{
-		name: name,
+		Name: Name,
 	}
 }

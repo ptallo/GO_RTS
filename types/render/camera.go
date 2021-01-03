@@ -22,13 +22,13 @@ func NewCamera(ssl ISpriteSheetLibrary, t *geometry.Point, s float64) ICamera {
 	}
 }
 
-// Draw draws an image on a screen adjusted for the cameras translation
+// Draw draws the renderComponent on the screen at the pointToDraw
 func (c *Camera) Draw(screen *ebiten.Image, renderComponent *RenderComponent, pointToDraw geometry.Point) {
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(pointToDraw.X, pointToDraw.Y)
 	opts.GeoM.Translate(-c.translation.X, -c.translation.Y)
 
-	img := c.ssl.GetSpriteSheet(renderComponent.name).GetImage()
+	img := c.ssl.GetSpriteSheet(renderComponent.Name).GetImage()
 
 	screen.DrawImage(img, opts)
 }
