@@ -26,7 +26,7 @@ func NewGameObjects(container *Container) *GameObjects {
 }
 
 // DrawGameObjects is responsible for drawing the images on the screen
-func DrawGameObjects(screen *ebiten.Image, g *GameObjects) {
+func (g *GameObjects) DrawGameObjects(screen *ebiten.Image) {
 	for _, tile := range g.Tiles {
 		tile.RenderComponent.Draw(screen, *tile.PositionComponent.GetPosition())
 	}
