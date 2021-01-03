@@ -30,11 +30,11 @@ func NewGameObjects(container *Container) *GameObjects {
 // DrawGameObjects is responsible for drawing the images on the screen
 func (g *GameObjects) DrawGameObjects(screen *ebiten.Image, camera render.ICamera) {
 	for _, tile := range g.Tiles {
-		camera.Draw(screen, tile.RenderComponent, *tile.PositionComponent.GetPosition())
+		camera.Draw(screen, tile.RenderComponent, *tile.PositionComponent.GetRectangle().Point)
 	}
 
 	for _, unit := range g.Units {
-		camera.Draw(screen, unit.RenderComponent, *unit.PositionComponent.GetPosition())
+		camera.Draw(screen, unit.RenderComponent, *unit.PositionComponent.GetRectangle().Point)
 	}
 }
 

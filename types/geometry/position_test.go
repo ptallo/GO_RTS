@@ -19,7 +19,7 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
-	end := p.GetPosition()
+	end := p.GetRectangle().Point
 	endDistance := math.Floor(end.DistanceFrom(dest)*1000) / 1000 // Rounded to not be too sensitive to floating point errors
 	startDistance := math.Floor(start.DistanceFrom(dest)*1000) / 1000
 	if endDistance != startDistance-speed {
@@ -40,7 +40,7 @@ func Test_WhenMovingTowardsDestination_ThenWillNotOverStep(t *testing.T) {
 	p.MoveTowardsDestination([]geometry.IPositionComponent{})
 
 	// Assert
-	end := p.GetPosition()
+	end := p.GetRectangle().Point
 	if end.DistanceFrom(dest) != 0.0 {
 		t.Errorf("end should be ontop of the destination")
 	}
@@ -83,7 +83,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 	}
 
 	// Assert
-	if p1.GetPosition().Equals(goalDestination) || p1.GetRectangle().Intersects(pc.GetRectangle()) {
+	if p1.GetRectangle().Point.Equals(goalDestination) || p1.GetRectangle().Intersects(pc.GetRectangle()) {
 		t.Error("shouldn't be able to move into un-pathable component")
 	}
 }
@@ -102,7 +102,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenPathsAround(t *testing.T) {
 	}
 
 	// Assert
-	if !p1.GetPosition().Equals(goalDestination) {
+	if !p1.GetRectangle().Point.Equals(goalDestination) {
 		t.Error("Should path around un-pathable components")
 	}
 }

@@ -23,10 +23,10 @@ func generateXYDivisions(components []IPositionComponent, mapRect Rectangle) ([]
 	yPoints := []float64{mapRect.Point.Y, mapRect.Point.Y + mapRect.Height}
 
 	for _, c := range components {
-		xPoints = append(xPoints, c.GetPosition().X)
-		xPoints = append(xPoints, c.GetPosition().X+c.GetRectangle().Width)
-		yPoints = append(yPoints, c.GetPosition().Y)
-		yPoints = append(yPoints, c.GetPosition().Y+c.GetRectangle().Height)
+		xPoints = append(xPoints, c.GetRectangle().Point.X)
+		xPoints = append(xPoints, c.GetRectangle().Point.X+c.GetRectangle().Width)
+		yPoints = append(yPoints, c.GetRectangle().Point.Y)
+		yPoints = append(yPoints, c.GetRectangle().Point.Y+c.GetRectangle().Height)
 	}
 
 	return removeDuplicates(xPoints), removeDuplicates(yPoints)

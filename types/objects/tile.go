@@ -46,15 +46,15 @@ func NewMapFromFile(ssl render.ISpriteSheetLibrary, camera render.ICamera, fileP
 
 func convertCharacterToTile(char string, ssl render.ISpriteSheetLibrary, camera render.ICamera, point geometry.Point) *Tile {
 	if char == "A" {
-		return NewGrassTile(ssl, camera, point)
+		return newGrassTile(ssl, camera, point)
 	} else if char == "B" {
-		return NewWaterTile(ssl, camera, point)
+		return newWaterTile(ssl, camera, point)
 	}
 	return nil
 }
 
-// NewTile is a shortcut for creating a Tile
-func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, isPathable bool, p geometry.Point) *Tile {
+// newTile is a shortcut for creating a Tile
+func newTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, isPathable bool, p geometry.Point) *Tile {
 	return &Tile{
 		RenderComponent:   render.NewRenderComponent(name),
 		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(tileWidth, tileHeight, p.X, p.Y), 0.0),
@@ -62,14 +62,13 @@ func NewTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, name string, is
 	}
 }
 
-// NewWaterTile is a shortcut to create a water tile
-func NewWaterTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
-	return NewTile(ssl, cam, "water", false, p)
+func newWaterTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
+	return newTile(ssl, cam, "water", false, p)
 }
 
-// NewGrassTile is a shortcut to create a grass tile
-func NewGrassTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
-	return NewTile(ssl, cam, "grass", true, p)
+// newGrassTile is a shortcut to create a grass tile
+func newGrassTile(ssl render.ISpriteSheetLibrary, cam render.ICamera, p geometry.Point) *Tile {
+	return newTile(ssl, cam, "grass", true, p)
 }
 
 // GetMapRectangle returns the rectangle describing the map

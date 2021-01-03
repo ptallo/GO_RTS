@@ -2,7 +2,6 @@ package geometry
 
 // IPositionComponent is an interface which describes how to handle position
 type IPositionComponent interface {
-	GetPosition() *Point
 	GetRectangle() Rectangle
 	SetDestination(Point, Rectangle, []IPositionComponent)
 	MoveTowardsDestination([]IPositionComponent)
@@ -28,11 +27,6 @@ type PositionComponent struct {
 	Speed              float64
 }
 
-// GetPosition returns the current position of the PositionComponent
-func (p *PositionComponent) GetPosition() *Point {
-	return p.Rectangle.Point
-}
-
 // GetRectangle returns the rectangle describing this position component
 func (p *PositionComponent) GetRectangle() Rectangle {
 	return *p.Rectangle
@@ -47,11 +41,36 @@ func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, co
 
 	graph := NewGraph(collidables, mapRect)
 	p.NodesToVisit = graph.PathFrom(*p.Rectangle.Point, goalDest)
-	p.UpdateCurrentDestination()
+	p.updateCurrentDestination()
 }
 
-// UpdateCurrentDestination will change the current destination based on the p.NodesToVisit and p.GoalDestination
-func (p *PositionComponent) UpdateCurrentDestination() {
+func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
+	if mapRect.Contains(goalDest) {
+		return goalDest
+	}
+
+	var newX float64
+	if goalDest.X < mapRect.Point.X {
+		newX = mapRect.Point.X
+	} else if goalDest.X > mapRect.Point.X+mapRect.Width {
+		newX = mapRect.Point.X + mapRect.Width
+	} else {
+		newX = goalDest.X
+	}
+
+	var newY float64
+	if goalDest.Y < mapRect.Point.Y {
+		newY = mapRect.Point.Y
+	} else if goalDest.Y > mapRect.Point.Y+mapRect.Height {
+		newY = mapRect.Point.Y + mapRect.Height
+	} else {
+		newY = goalDest.Y
+	}
+
+	return NewPoint(newX, newY)
+}
+
+func (p *PositionComponent) updateCurrentDestination() {
 	if len(p.NodesToVisit) >= 3 {
 		currentDdestination := p.getPointFromNodes(p.NodesToVisit[0], p.NodesToVisit[1], p.NodesToVisit[2])
 		p.CurrentDestination = &currentDdestination
@@ -63,11 +82,11 @@ func (p *PositionComponent) UpdateCurrentDestination() {
 
 func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode Rectangle) Point {
 	leftX := nextNode.Point.X
-	middleX := p.GetPosition().X
+	middleX := p.GetRectangle().Point.X
 	rightX := nextNode.Point.X + nextNode.Width - p.GetRectangle().Width
 
 	topY := nextNode.Point.Y
-	middleY := p.GetPosition().Y
+	middleY := p.GetRectangle().Point.Y
 	bottomY := nextNode.Point.Y + nextNode.Height - p.GetRectangle().Height
 
 	if currentNode.IsTopAdjacent(nextNode) {
@@ -113,42 +132,16 @@ func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode R
 	return Point{}
 }
 
-func getInMapDestination(goalDest Point, mapRect Rectangle) Point {
-	if mapRect.Contains(goalDest) {
-		return goalDest
-	}
-
-	var newX float64
-	if goalDest.X < mapRect.Point.X {
-		newX = mapRect.Point.X
-	} else if goalDest.X > mapRect.Point.X+mapRect.Width {
-		newX = mapRect.Point.X + mapRect.Width
-	} else {
-		newX = goalDest.X
-	}
-
-	var newY float64
-	if goalDest.Y < mapRect.Point.Y {
-		newY = mapRect.Point.Y
-	} else if goalDest.Y > mapRect.Point.Y+mapRect.Height {
-		newY = mapRect.Point.Y + mapRect.Height
-	} else {
-		newY = goalDest.Y
-	}
-
-	return NewPoint(newX, newY)
-}
-
 // MoveTowardsDestination defines how to move towards the destination
 func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionComponent) {
 	if p.Rectangle.Point.Equals(*p.CurrentDestination) && !p.CurrentDestination.Equals(*p.GoalDestination) {
-		p.UpdateCurrentDestination()
+		p.updateCurrentDestination()
 	}
 
 	p.Rectangle.Point.Translate(*p.getTranslationVector())
 
 	avgPoint := NewPoint(0.0, 0.0)
-	for _, c := range p.Collisions(collidables) {
+	for _, c := range p.getCollisions(collidables) {
 		vecAway := c.GetRectangle().Center().To(p.GetRectangle().Center()).Unit().Scale(p.Speed * 1.5)
 		avgPoint.Translate(vecAway)
 	}
@@ -167,8 +160,7 @@ func (p *PositionComponent) getTranslationVector() *Point {
 	return &returnPoint
 }
 
-// Collisions returns all position components from pcs which collide with p
-func (p *PositionComponent) Collisions(pcs []IPositionComponent) []IPositionComponent {
+func (p *PositionComponent) getCollisions(pcs []IPositionComponent) []IPositionComponent {
 	collisions := make([]IPositionComponent, 0)
 	for _, pc := range pcs {
 		if pc.GetRectangle().Intersects(p.GetRectangle()) {
