@@ -12,10 +12,15 @@ type Unit struct {
 }
 
 // NewUnit is a shorcut for creating a NewUnit
-func NewUnit(ssl render.ISpriteSheetLibrary, camera render.ICamera, startPosition geometry.Point) *Unit {
+func NewUnit(startPosition geometry.Point) *Unit {
 	u := Unit{
 		RenderComponent:   render.NewRenderComponent("man"),
 		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, startPosition.X, startPosition.Y), 5.0),
 	}
 	return &u
+}
+
+// Equals returns true if the two units are identical
+func (u Unit) Equals(u2 Unit) bool {
+	return u.RenderComponent.Equals(*u2.RenderComponent) && u.PositionComponent.Equals(u2.PositionComponent)
 }

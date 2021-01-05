@@ -1,7 +1,7 @@
 package geometry_test
 
 import (
-	"go_rts/types/geometry"
+	"go_rts/core/geometry"
 	"testing"
 )
 

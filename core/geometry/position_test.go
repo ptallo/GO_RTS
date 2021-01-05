@@ -1,10 +1,29 @@
 package geometry_test
 
 import (
-	"go_rts/types/geometry"
+	"go_rts/core/geometry"
 	"math"
 	"testing"
 )
+
+func Test_GivenIdenticalPositionComponents_WhenCheckingEquality_ThenReturnsTrue(t *testing.T) {
+	p1 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
+	p2 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
+
+	if !p1.Equals(p2) {
+		t.Error("identical components when checking equality should return true")
+	}
+}
+
+func Test_GivenNonIdenticalPositionComponents_WhenCheckingEquality_ThenReturnsFalse(t *testing.T) {
+	p1 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
+	p2 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 66.6), 55.5)
+	p3 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 66.6)
+
+	if p1.Equals(p2) || p1.Equals(p3) {
+		t.Error("non-identical components should return false when checking equality")
+	}
+}
 
 func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.T) {
 	// Arrange

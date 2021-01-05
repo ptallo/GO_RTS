@@ -22,7 +22,7 @@ func NewGame(width, height int) Game {
 		width:       width,
 		height:      height,
 		container:   c,
-		gameObjects: NewGameObjects(c),
+		gameObjects: NewGameObjects(),
 	}
 
 	game.container.GetEventHandler().OnLBP(func(p geometry.Point) {

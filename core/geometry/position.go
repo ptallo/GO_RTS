@@ -3,8 +3,10 @@ package geometry
 // IPositionComponent is an interface which describes how to handle position
 type IPositionComponent interface {
 	GetRectangle() Rectangle
+	GetSpeed() float64
 	SetDestination(Point, Rectangle, []IPositionComponent)
 	MoveTowardsDestination([]IPositionComponent)
+	Equals(IPositionComponent) bool
 }
 
 // NewPositionComponent is a shortcut to create a PositionComponent
@@ -27,9 +29,19 @@ type PositionComponent struct {
 	Speed              float64
 }
 
+// Equals checks if two position components are equal
+func (p PositionComponent) Equals(p2 IPositionComponent) bool {
+	return p.Rectangle.Equals(p2.GetRectangle()) && p.Speed == p2.GetSpeed()
+}
+
 // GetRectangle returns the rectangle describing this position component
-func (p *PositionComponent) GetRectangle() Rectangle {
+func (p PositionComponent) GetRectangle() Rectangle {
 	return *p.Rectangle
+}
+
+// GetSpeed returns the speed of the position component
+func (p PositionComponent) GetSpeed() float64 {
+	return p.Speed
 }
 
 // SetDestination sets the destination of the PositionComponent
