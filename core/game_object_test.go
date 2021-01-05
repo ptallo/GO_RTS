@@ -76,16 +76,28 @@ func Test_GivenNonIdenticalGameobjects_WhenCheckingForEquality_ThenReturnsFalse(
 	gameObjects1 := &core.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1, unit2},
-		SelectedUnits: []*objects.Unit{},
+		SelectedUnits: []*objects.Unit{unit1},
 	}
 
 	gameObjects2 := &core.GameObjects{
 		Tiles:         []*objects.Tile{tile1},
+		Units:         []*objects.Unit{unit1, unit2},
+		SelectedUnits: []*objects.Unit{unit1},
+	}
+
+	gameObjects3 := &core.GameObjects{
+		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1},
 		SelectedUnits: []*objects.Unit{unit1},
 	}
 
-	if gameObjects1.Equals(gameObjects2) {
+	gameObjects4 := &core.GameObjects{
+		Tiles:         []*objects.Tile{tile1},
+		Units:         []*objects.Unit{unit1, unit2},
+		SelectedUnits: []*objects.Unit{},
+	}
+
+	if gameObjects1.Equals(gameObjects2) || gameObjects1.Equals(gameObjects3) || gameObjects1.Equals(gameObjects4) {
 		t.Error("non-identical gameObjects should return false for equality")
 	}
 }
