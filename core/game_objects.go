@@ -50,10 +50,19 @@ func (g *GameObjects) Deserialize(bytes []byte) *GameObjects {
 
 // Equals checks for equality between these gameObjects and others
 func (g *GameObjects) Equals(g2 *GameObjects) bool {
-	for _, tile := range g.Tiles {
+	return areAllTilesInOtherArray(g.Tiles, g2.Tiles) &&
+		areAllTilesInOtherArray(g2.Tiles, g.Tiles) &&
+		areAllUnitsInOtherArray(g.Units, g2.Units) &&
+		areAllUnitsInOtherArray(g2.Units, g.Units) &&
+		areAllUnitsInOtherArray(g.SelectedUnits, g2.SelectedUnits) &&
+		areAllUnitsInOtherArray(g2.SelectedUnits, g.SelectedUnits)
+}
+
+func areAllTilesInOtherArray(arr1, arr2 []*objects.Tile) bool {
+	for _, t1 := range arr1 {
 		inOtherArray := false
-		for _, otherTile := range g2.Tiles {
-			if tile.Equals(*otherTile) {
+		for _, t2 := range arr2 {
+			if t1.Equals(*t2) {
 				inOtherArray = true
 			}
 		}
@@ -62,10 +71,13 @@ func (g *GameObjects) Equals(g2 *GameObjects) bool {
 			return false
 		}
 	}
+	return true
+}
 
-	for _, u1 := range g.Units {
+func areAllUnitsInOtherArray(arr1, arr2 []*objects.Unit) bool {
+	for _, u1 := range arr1 {
 		inOtherArray := false
-		for _, u2 := range g2.Units {
+		for _, u2 := range arr2 {
 			if u1.Equals(*u2) {
 				inOtherArray = true
 			}
@@ -75,20 +87,6 @@ func (g *GameObjects) Equals(g2 *GameObjects) bool {
 			return false
 		}
 	}
-
-	for _, u1 := range g.SelectedUnits {
-		inOtherArray := false
-		for _, u2 := range g2.SelectedUnits {
-			if u1.Equals(*u2) {
-				inOtherArray = true
-			}
-		}
-
-		if !inOtherArray {
-			return false
-		}
-	}
-
 	return true
 }
 
