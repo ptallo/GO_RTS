@@ -1,14 +1,5 @@
 package geometry
 
-// IPositionComponent is an interface which describes how to handle position
-type IPositionComponent interface {
-	GetRectangle() Rectangle
-	GetSpeed() float64
-	SetDestination(Point, Rectangle, []IPositionComponent)
-	MoveTowardsDestination([]IPositionComponent)
-	Equals(IPositionComponent) bool
-}
-
 // NewPositionComponent is a shortcut to create a PositionComponent
 func NewPositionComponent(rect Rectangle, speed float64) *PositionComponent {
 	return &PositionComponent{
@@ -20,7 +11,7 @@ func NewPositionComponent(rect Rectangle, speed float64) *PositionComponent {
 	}
 }
 
-// PositionComponent is a struct which implements the IPositionComponent
+// PositionComponent is a struct which implements the PositionComponent
 type PositionComponent struct {
 	Rectangle          *Rectangle
 	CurrentDestination *Point
@@ -30,22 +21,12 @@ type PositionComponent struct {
 }
 
 // Equals checks if two position components are equal
-func (p PositionComponent) Equals(p2 IPositionComponent) bool {
-	return p.Rectangle.Equals(p2.GetRectangle()) && p.Speed == p2.GetSpeed()
-}
-
-// GetRectangle returns the rectangle describing this position component
-func (p PositionComponent) GetRectangle() Rectangle {
-	return *p.Rectangle
-}
-
-// GetSpeed returns the speed of the position component
-func (p PositionComponent) GetSpeed() float64 {
-	return p.Speed
+func (p PositionComponent) Equals(p2 PositionComponent) bool {
+	return p.Rectangle.Equals(*p2.Rectangle) && p.Speed == p2.Speed
 }
 
 // SetDestination sets the destination of the PositionComponent
-func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, collidables []IPositionComponent) {
+func (p *PositionComponent) SetDestination(goalDest Point, mapRect Rectangle, collidables []PositionComponent) {
 	if !mapRect.Contains(goalDest) {
 		goalDest = getInMapDestination(goalDest, mapRect)
 	}
@@ -94,12 +75,12 @@ func (p *PositionComponent) updateCurrentDestination() {
 
 func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode Rectangle) Point {
 	leftX := nextNode.Point.X
-	middleX := p.GetRectangle().Point.X
-	rightX := nextNode.Point.X + nextNode.Width - p.GetRectangle().Width
+	middleX := p.Rectangle.Point.X
+	rightX := nextNode.Point.X + nextNode.Width - p.Rectangle.Width
 
 	topY := nextNode.Point.Y
-	middleY := p.GetRectangle().Point.Y
-	bottomY := nextNode.Point.Y + nextNode.Height - p.GetRectangle().Height
+	middleY := p.Rectangle.Point.Y
+	bottomY := nextNode.Point.Y + nextNode.Height - p.Rectangle.Height
 
 	if currentNode.IsTopAdjacent(nextNode) {
 		if nextNode.IsTopAdjacent(thirdNode) {
@@ -145,7 +126,7 @@ func (p *PositionComponent) getPointFromNodes(currentNode, nextNode, thirdNode R
 }
 
 // MoveTowardsDestination defines how to move towards the destination
-func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionComponent) {
+func (p *PositionComponent) MoveTowardsDestination(collidables []PositionComponent) {
 	if p.Rectangle.Point.Equals(*p.CurrentDestination) && !p.CurrentDestination.Equals(*p.GoalDestination) {
 		p.updateCurrentDestination()
 	}
@@ -154,7 +135,7 @@ func (p *PositionComponent) MoveTowardsDestination(collidables []IPositionCompon
 
 	avgPoint := NewPoint(0.0, 0.0)
 	for _, c := range p.getCollisions(collidables) {
-		vecAway := c.GetRectangle().Center().To(p.GetRectangle().Center()).Unit().Scale(p.Speed * 1.5)
+		vecAway := c.Rectangle.Center().To(p.Rectangle.Center()).Unit().Scale(p.Speed * 1.5)
 		avgPoint.Translate(vecAway)
 	}
 	p.Rectangle.Point.Translate(avgPoint)
@@ -172,10 +153,10 @@ func (p *PositionComponent) getTranslationVector() *Point {
 	return &returnPoint
 }
 
-func (p *PositionComponent) getCollisions(pcs []IPositionComponent) []IPositionComponent {
-	collisions := make([]IPositionComponent, 0)
+func (p *PositionComponent) getCollisions(pcs []PositionComponent) []PositionComponent {
+	collisions := make([]PositionComponent, 0)
 	for _, pc := range pcs {
-		if pc.GetRectangle().Intersects(p.GetRectangle()) {
+		if pc.Rectangle.Intersects(*p.Rectangle) {
 			collisions = append(collisions, pc)
 		}
 	}

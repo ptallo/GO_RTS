@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"go_rts/core/geometry"
 	"go_rts/core/objects"
 	"go_rts/core/render"
@@ -30,12 +31,21 @@ func NewGameObjects() *GameObjects {
 
 // Serialize turns the GameObjects object to a byte array
 func (g *GameObjects) Serialize() []byte {
-	return []byte{}
+	bytes, err := json.Marshal(g)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
 }
 
 // Deserialize turns a byte array into a GameObjects object
-func (g *GameObjects) Deserialize([]byte) *GameObjects {
-	return NewGameObjects()
+func (g *GameObjects) Deserialize(bytes []byte) *GameObjects {
+	var gameObjects GameObjects
+	err := json.Unmarshal(bytes, &gameObjects)
+	if err != nil {
+		panic(err)
+	}
+	return &gameObjects
 }
 
 // Equals checks for equality between these gameObjects and others
@@ -85,11 +95,11 @@ func (g *GameObjects) Equals(g2 *GameObjects) bool {
 // DrawGameObjects is responsible for drawing the images on the screen
 func (g *GameObjects) DrawGameObjects(screen *ebiten.Image, camera render.ICamera) {
 	for _, tile := range g.Tiles {
-		camera.Draw(screen, tile.RenderComponent, *tile.PositionComponent.GetRectangle().Point)
+		camera.Draw(screen, tile.RenderComponent, *tile.PositionComponent.Rectangle.Point)
 	}
 
 	for _, unit := range g.Units {
-		camera.Draw(screen, unit.RenderComponent, *unit.PositionComponent.GetRectangle().Point)
+		camera.Draw(screen, unit.RenderComponent, *unit.PositionComponent.Rectangle.Point)
 	}
 }
 
@@ -109,11 +119,11 @@ func (g *GameObjects) SetUnitsDestinations(p *geometry.Point) {
 	}
 }
 
-func (g *GameObjects) getCollidableComponents() []geometry.IPositionComponent {
-	nonPathableTiles := make([]geometry.IPositionComponent, 0)
+func (g *GameObjects) getCollidableComponents() []geometry.PositionComponent {
+	nonPathableTiles := make([]geometry.PositionComponent, 0)
 	for _, tile := range g.Tiles {
 		if !tile.IsPathable {
-			nonPathableTiles = append(nonPathableTiles, tile.PositionComponent)
+			nonPathableTiles = append(nonPathableTiles, *tile.PositionComponent)
 		}
 	}
 	return nonPathableTiles
@@ -123,7 +133,7 @@ func (g *GameObjects) getCollidableComponents() []geometry.IPositionComponent {
 func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*objects.Unit {
 	selectedUnits := make([]*objects.Unit, 0)
 	for _, unit := range g.Units {
-		if selectionRect.Intersects(unit.PositionComponent.GetRectangle()) {
+		if selectionRect.Intersects(*unit.PositionComponent.Rectangle) {
 			selectedUnits = append(selectedUnits, unit)
 		}
 	}

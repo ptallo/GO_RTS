@@ -8,7 +8,7 @@ import (
 
 func Test_GivenIdenticalPositionComponents_WhenCheckingEquality_ThenReturnsTrue(t *testing.T) {
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
-	p2 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
+	p2 := *geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
 
 	if !p1.Equals(p2) {
 		t.Error("identical components when checking equality should return true")
@@ -17,8 +17,8 @@ func Test_GivenIdenticalPositionComponents_WhenCheckingEquality_ThenReturnsTrue(
 
 func Test_GivenNonIdenticalPositionComponents_WhenCheckingEquality_ThenReturnsFalse(t *testing.T) {
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 55.5)
-	p2 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 66.6), 55.5)
-	p3 := geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 66.6)
+	p2 := *geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 66.6), 55.5)
+	p3 := *geometry.NewPositionComponent(geometry.NewRectangle(11.1, 22.2, 33.3, 44.4), 66.6)
 
 	if p1.Equals(p2) || p1.Equals(p3) {
 		t.Error("non-identical components should return false when checking equality")
@@ -34,11 +34,11 @@ func Test_WhenMovingTowardsDestination_ThenDistanceIsEffectedBySpeed(t *testing.
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(dest, mapRect, []geometry.IPositionComponent{})
-	p.MoveTowardsDestination([]geometry.IPositionComponent{})
+	p.SetDestination(dest, mapRect, []geometry.PositionComponent{})
+	p.MoveTowardsDestination([]geometry.PositionComponent{})
 
 	// Assert
-	end := p.GetRectangle().Point
+	end := p.Rectangle.Point
 	endDistance := math.Floor(end.DistanceFrom(dest)*1000) / 1000 // Rounded to not be too sensitive to floating point errors
 	startDistance := math.Floor(start.DistanceFrom(dest)*1000) / 1000
 	if endDistance != startDistance-speed {
@@ -55,11 +55,11 @@ func Test_WhenMovingTowardsDestination_ThenWillNotOverStep(t *testing.T) {
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(dest, mapRect, []geometry.IPositionComponent{})
-	p.MoveTowardsDestination([]geometry.IPositionComponent{})
+	p.SetDestination(dest, mapRect, []geometry.PositionComponent{})
+	p.MoveTowardsDestination([]geometry.PositionComponent{})
 
 	// Assert
-	end := p.GetRectangle().Point
+	end := p.Rectangle.Point
 	if end.DistanceFrom(dest) != 0.0 {
 		t.Errorf("end should be ontop of the destination")
 	}
@@ -78,7 +78,7 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination, expectedDestination geom
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, 0.0, 0.0)
 
 	// Act
-	p.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{})
+	p.SetDestination(goalDestination, mapRect, []geometry.PositionComponent{})
 
 	// Assert
 	actualDestination := *p.GoalDestination
@@ -90,26 +90,26 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination, expectedDestination geom
 func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T) {
 	// Arrange
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
-	pc := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)
+	pc := *geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 10.0, 0.0), 1000.0)
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, -500.0, -500.0)
 
 	// Act
 	goalDestination := geometry.NewPoint(15.0, 0.0)
-	p1.SetDestination(goalDestination, mapRect, []geometry.IPositionComponent{pc})
+	p1.SetDestination(goalDestination, mapRect, []geometry.PositionComponent{pc})
 
 	for i := 0; i < 1000; i++ {
-		p1.MoveTowardsDestination([]geometry.IPositionComponent{pc})
+		p1.MoveTowardsDestination([]geometry.PositionComponent{pc})
 	}
 
 	// Assert
-	if p1.GetRectangle().Point.Equals(goalDestination) || p1.GetRectangle().Intersects(pc.GetRectangle()) {
+	if p1.Rectangle.Point.Equals(goalDestination) || p1.Rectangle.Intersects(*pc.Rectangle) {
 		t.Error("shouldn't be able to move into un-pathable component")
 	}
 }
 
 func Test_GivenUnpathableComponent_WhenMoving_ThenPathsAround(t *testing.T) {
 	p1 := geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 0.0, 0.0), 5.0)
-	pcs := []geometry.IPositionComponent{geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 20.0, 0.0), 1000.0)}
+	pcs := []geometry.PositionComponent{*geometry.NewPositionComponent(geometry.NewRectangle(10.0, 10.0, 20.0, 0.0), 1000.0)}
 	mapRect := geometry.NewRectangle(1000.0, 1000.0, -500.0, -500.0)
 
 	// Act
@@ -117,11 +117,11 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenPathsAround(t *testing.T) {
 	p1.SetDestination(goalDestination, mapRect, pcs)
 
 	for i := 0; i < 1000; i++ {
-		p1.MoveTowardsDestination([]geometry.IPositionComponent{})
+		p1.MoveTowardsDestination([]geometry.PositionComponent{})
 	}
 
 	// Assert
-	if !p1.GetRectangle().Point.Equals(goalDestination) {
+	if !p1.Rectangle.Point.Equals(goalDestination) {
 		t.Error("Should path around un-pathable components")
 	}
 }

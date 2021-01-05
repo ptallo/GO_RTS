@@ -8,7 +8,7 @@ type Graph struct {
 }
 
 // NewGraph creates a graph with nodes based on the components and mapRect
-func NewGraph(components []IPositionComponent, mapRect Rectangle) Graph {
+func NewGraph(components []PositionComponent, mapRect Rectangle) Graph {
 	xPoints, yPoints := generateXYDivisions(components, mapRect)
 	rects := makeRectsFromXYDivisions(xPoints, yPoints)
 	nonPcRects := filterCollidableRects(rects, components)
@@ -18,15 +18,15 @@ func NewGraph(components []IPositionComponent, mapRect Rectangle) Graph {
 	}
 }
 
-func generateXYDivisions(components []IPositionComponent, mapRect Rectangle) ([]float64, []float64) {
+func generateXYDivisions(components []PositionComponent, mapRect Rectangle) ([]float64, []float64) {
 	xPoints := []float64{mapRect.Point.X, mapRect.Point.X + mapRect.Width}
 	yPoints := []float64{mapRect.Point.Y, mapRect.Point.Y + mapRect.Height}
 
 	for _, c := range components {
-		xPoints = append(xPoints, c.GetRectangle().Point.X)
-		xPoints = append(xPoints, c.GetRectangle().Point.X+c.GetRectangle().Width)
-		yPoints = append(yPoints, c.GetRectangle().Point.Y)
-		yPoints = append(yPoints, c.GetRectangle().Point.Y+c.GetRectangle().Height)
+		xPoints = append(xPoints, c.Rectangle.Point.X)
+		xPoints = append(xPoints, c.Rectangle.Point.X+c.Rectangle.Width)
+		yPoints = append(yPoints, c.Rectangle.Point.Y)
+		yPoints = append(yPoints, c.Rectangle.Point.Y+c.Rectangle.Height)
 	}
 
 	return removeDuplicates(xPoints), removeDuplicates(yPoints)
@@ -57,12 +57,12 @@ func makeRectsFromXYDivisions(xPoints, yPoints []float64) []Rectangle {
 	return rects
 }
 
-func filterCollidableRects(rects []Rectangle, components []IPositionComponent) []Rectangle {
+func filterCollidableRects(rects []Rectangle, components []PositionComponent) []Rectangle {
 	nonPcRects := make([]Rectangle, 0)
 	for _, r := range rects {
 		inPcs := false
 		for _, pc := range components {
-			if pc.GetRectangle().Equals(r) {
+			if pc.Rectangle.Equals(r) {
 				inPcs = true
 			}
 		}

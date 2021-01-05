@@ -6,7 +6,7 @@ import (
 )
 
 func Test_GivenNoCollidables_ThenReturnsDest(t *testing.T) {
-	graph := geometry.NewGraph([]geometry.IPositionComponent{}, geometry.NewRectangle(256.0, 256.0, 0.0, 0.0))
+	graph := geometry.NewGraph([]geometry.PositionComponent{}, geometry.NewRectangle(256.0, 256.0, 0.0, 0.0))
 	start := geometry.NewPoint(10.0, 10.0)
 	destination := geometry.NewPoint(100.0, 100.0)
 
@@ -19,10 +19,10 @@ func Test_GivenNoCollidables_ThenReturnsDest(t *testing.T) {
 
 func Test_GivenGraph_WhenPathing_ThenGeneratesPoints(t *testing.T) {
 	// Arrange
-	pcs := []geometry.IPositionComponent{
-		geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 0.0), 0.0),
-		geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 64.0), 0.0),
-		geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 128.0), 0.0),
+	pcs := []geometry.PositionComponent{
+		*geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 0.0), 0.0),
+		*geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 64.0), 0.0),
+		*geometry.NewPositionComponent(geometry.NewRectangle(64.0, 64.0, 128.0, 128.0), 0.0),
 	}
 	mapRect := geometry.NewRectangle(256.0, 256.0, 0.0, 0.0)
 	graph := geometry.NewGraph(pcs, mapRect)

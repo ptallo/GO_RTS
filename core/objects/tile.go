@@ -17,13 +17,13 @@ const (
 // Tile is an object describing a map tile
 type Tile struct {
 	RenderComponent   *render.RenderComponent
-	PositionComponent geometry.IPositionComponent
+	PositionComponent *geometry.PositionComponent
 	IsPathable        bool
 }
 
 // Equals checks whether this tile is equal to another tile
 func (t Tile) Equals(t2 Tile) bool {
-	return t.RenderComponent.Equals(*t2.RenderComponent) && t.PositionComponent.Equals(t2.PositionComponent) && t.IsPathable == t2.IsPathable
+	return t.RenderComponent.Equals(*t2.RenderComponent) && t.PositionComponent.Equals(*t2.PositionComponent) && t.IsPathable == t2.IsPathable
 }
 
 // NewMapFromFile loads a map from a file
@@ -84,7 +84,7 @@ func GetMapRectangle(tiles []*Tile) geometry.Rectangle {
 	maxY := -999999999.0
 
 	for _, tile := range tiles {
-		tileRect := tile.PositionComponent.GetRectangle()
+		tileRect := tile.PositionComponent.Rectangle
 		if minX > tileRect.Point.X {
 			minX = tileRect.Point.X
 		} else if maxX < tileRect.Point.X+tileRect.Width {
