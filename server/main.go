@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"go_rts/core/geometry"
+	"go_rts/core/objects"
 	"net"
 )
 
@@ -14,6 +16,13 @@ func main() {
 	defer listener.Close()
 	fmt.Println("listening on tcp port 8080...")
 
+	gameObjects := objects.NewGameObjects()
+	for _, u := range gameObjects.Units {
+		u.PositionComponent.SetDestination(geometry.NewPoint(500.0, 300.0), objects.GetMapRectangle(gameObjects.Tiles), gameObjects.GetCollidableComponents())
+	}
+
+	gameObjects.Update()
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -21,12 +30,9 @@ func main() {
 		} else {
 			fmt.Printf("connection accepted from %v\n", conn.LocalAddr().String())
 
-			for i := 0; i < 10; i++ {
-				fmt.Fprintf(conn, "here is some stuff, please take %v\n", i+1)
-			}
-			fmt.Fprint(conn, "DONE\n")
+			defer conn.Close()
 
-			conn.Close()
+			fmt.Fprintf(conn, fmt.Sprintf("%s\n", string(gameObjects.Serialize())))
 		}
 	}
 }

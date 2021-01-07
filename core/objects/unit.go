@@ -15,7 +15,7 @@ type Unit struct {
 func NewUnit(startPosition geometry.Point) *Unit {
 	u := Unit{
 		RenderComponent:   render.NewRenderComponent("man"),
-		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, startPosition.X, startPosition.Y), 5.0),
+		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, startPosition.X, startPosition.Y), 0.5),
 	}
 	return &u
 }

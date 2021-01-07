@@ -1,7 +1,6 @@
-package core_test
+package objects_test
 
 import (
-	"go_rts/core"
 	"go_rts/core/geometry"
 	"go_rts/core/objects"
 	"testing"
@@ -13,13 +12,13 @@ func Test_GivenIdenticalGameObjects_WhenCheckingForEquality_ThenReturnsTrue(t *t
 	unit1 := objects.NewUnit(geometry.NewPoint(100.0, 200.0))
 	unit2 := objects.NewUnit(geometry.NewPoint(100.0, 300.0))
 
-	gameObjects1 := &core.GameObjects{
+	gameObjects1 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{unit1},
 	}
 
-	gameObjects2 := &core.GameObjects{
+	gameObjects2 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{unit1},
@@ -32,7 +31,7 @@ func Test_GivenIdenticalGameObjects_WhenCheckingForEquality_ThenReturnsTrue(t *t
 
 func Test_GivenIdenticalGameObjects_WithNonIdenticalPointers_WhenCheckingForEquality_ThenReturnsTrue(t *testing.T) {
 
-	gameObjects1 := &core.GameObjects{
+	gameObjects1 := &objects.GameObjects{
 		Tiles: []*objects.Tile{
 			objects.NewTile("water", false, geometry.NewPoint(10.0, 10.0)),
 			objects.NewTile("grass", true, geometry.NewPoint(10.0, 10.0)),
@@ -47,7 +46,7 @@ func Test_GivenIdenticalGameObjects_WithNonIdenticalPointers_WhenCheckingForEqua
 		},
 	}
 
-	gameObjects2 := &core.GameObjects{
+	gameObjects2 := &objects.GameObjects{
 		Tiles: []*objects.Tile{
 			objects.NewTile("water", false, geometry.NewPoint(10.0, 10.0)),
 			objects.NewTile("grass", true, geometry.NewPoint(10.0, 10.0)),
@@ -73,25 +72,25 @@ func Test_GivenNonIdenticalGameobjects_WhenCheckingForEquality_ThenReturnsFalse(
 	unit1 := objects.NewUnit(geometry.NewPoint(100.0, 200.0))
 	unit2 := objects.NewUnit(geometry.NewPoint(100.0, 300.0))
 
-	gameObjects1 := &core.GameObjects{
+	gameObjects1 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{unit1},
 	}
 
-	gameObjects2 := &core.GameObjects{
+	gameObjects2 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{unit1},
 	}
 
-	gameObjects3 := &core.GameObjects{
+	gameObjects3 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1},
 		SelectedUnits: []*objects.Unit{unit1},
 	}
 
-	gameObjects4 := &core.GameObjects{
+	gameObjects4 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{},
@@ -110,7 +109,7 @@ func Test_GivenGameObjects_ThenCanSerialize_ThenDeserialize(t *testing.T) {
 	unit2 := objects.NewUnit(geometry.NewPoint(100.0, 300.0))
 	unit3 := objects.NewUnit(geometry.NewPoint(100.0, 400.0))
 
-	gameObjects := &core.GameObjects{
+	gameObjects := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2, tile3},
 		Units:         []*objects.Unit{unit1, unit2, unit3},
 		SelectedUnits: []*objects.Unit{unit1, unit2, unit3},
@@ -120,7 +119,7 @@ func Test_GivenGameObjects_ThenCanSerialize_ThenDeserialize(t *testing.T) {
 		t.Error("deserialized gameObjects should equal pre-serialized game objects")
 	}
 
-	gameObjects2 := &core.GameObjects{
+	gameObjects2 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1},
 		Units:         []*objects.Unit{unit1},
 		SelectedUnits: []*objects.Unit{unit1},
@@ -130,7 +129,7 @@ func Test_GivenGameObjects_ThenCanSerialize_ThenDeserialize(t *testing.T) {
 		t.Error("deserialized gameObjects should equal pre-serialized game objects")
 	}
 
-	gameObjects3 := &core.GameObjects{
+	gameObjects3 := &objects.GameObjects{
 		Tiles:         []*objects.Tile{tile1, tile2},
 		Units:         []*objects.Unit{unit1, unit2},
 		SelectedUnits: []*objects.Unit{unit1, unit2},

@@ -12,7 +12,7 @@ type Game struct {
 	width       int
 	height      int
 	container   *Container
-	gameObjects *GameObjects
+	gameObjects *objects.GameObjects
 }
 
 // NewGame a shorcut method to instantiate a game object
@@ -22,7 +22,7 @@ func NewGame(width, height int) Game {
 		width:       width,
 		height:      height,
 		container:   c,
-		gameObjects: NewGameObjects(),
+		gameObjects: &objects.GameObjects{},
 	}
 
 	game.container.GetEventHandler().OnLBP(func(p geometry.Point) {
@@ -41,6 +41,14 @@ func NewGame(width, height int) Game {
 		game.gameObjects.SetUnitsDestinations(&p)
 	})
 
+	game.container.GetEventHandler().OnGameObjectsChanged(game.SetGameObjects)
+
+	go func() {
+		for {
+			game.container.GetTCPClient().Listen()
+		}
+	}()
+
 	return game
 }
 
@@ -53,8 +61,12 @@ func (g *Game) Update() error {
 	)
 	g.container.GetMouse().Update()
 	g.container.GetEventHandler().Listen()
-	g.gameObjects.Update()
 	return nil
+}
+
+// SetGameObjects takes a new gameObjects object and overwrites the current one
+func (g *Game) SetGameObjects(gameObjs *objects.GameObjects) {
+	g.gameObjects.Copy(gameObjs)
 }
 
 // Draw is used to draw any relevant images on the screen

@@ -1,9 +1,8 @@
-package core
+package objects
 
 import (
 	"encoding/json"
 	"go_rts/core/geometry"
-	"go_rts/core/objects"
 	"go_rts/core/render"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,21 +10,37 @@ import (
 
 // GameObjects is a contianer for holding game information
 type GameObjects struct {
-	Tiles         []*objects.Tile
-	Units         []*objects.Unit
-	SelectedUnits []*objects.Unit
+	Tiles         []*Tile
+	Units         []*Unit
+	SelectedUnits []*Unit
 }
 
 // NewGameObjects returns a standard initialization of the gameobjects
 func NewGameObjects() *GameObjects {
-	tile1 := objects.NewTile("water", false, geometry.NewPoint(10.0, 10.0))
-	tile2 := objects.NewTile("grass", true, geometry.NewPoint(10.0, 10.0))
-	unit1 := objects.NewUnit(geometry.NewPoint(100.0, 200.0))
-	unit2 := objects.NewUnit(geometry.NewPoint(100.0, 300.0))
+	unit1 := NewUnit(geometry.NewPoint(100.0, 200.0))
+	unit2 := NewUnit(geometry.NewPoint(100.0, 300.0))
 	return &GameObjects{
-		Tiles:         []*objects.Tile{tile1, tile2},
-		Units:         []*objects.Unit{unit1, unit2},
-		SelectedUnits: []*objects.Unit{},
+		Tiles:         NewMapFromFile("./assets/maps/map1.txt"),
+		Units:         []*Unit{unit1, unit2},
+		SelectedUnits: []*Unit{},
+	}
+}
+
+// Copy
+func (g *GameObjects) Copy(gameObjs *GameObjects) {
+	g.Tiles = []*Tile{}
+	for _, tile := range gameObjs.Tiles {
+		g.Tiles = append(g.Tiles, tile)
+	}
+
+	g.Units = []*Unit{}
+	for _, unit := range gameObjs.Units {
+		g.Units = append(g.Units, unit)
+	}
+
+	g.SelectedUnits = []*Unit{}
+	for _, unit := range gameObjs.SelectedUnits {
+		g.SelectedUnits = append(g.SelectedUnits, unit)
 	}
 }
 
@@ -58,7 +73,7 @@ func (g *GameObjects) Equals(g2 *GameObjects) bool {
 		areAllUnitsInOtherArray(g2.SelectedUnits, g.SelectedUnits)
 }
 
-func areAllTilesInOtherArray(arr1, arr2 []*objects.Tile) bool {
+func areAllTilesInOtherArray(arr1, arr2 []*Tile) bool {
 	for _, t1 := range arr1 {
 		inOtherArray := false
 		for _, t2 := range arr2 {
@@ -74,7 +89,7 @@ func areAllTilesInOtherArray(arr1, arr2 []*objects.Tile) bool {
 	return true
 }
 
-func areAllUnitsInOtherArray(arr1, arr2 []*objects.Unit) bool {
+func areAllUnitsInOtherArray(arr1, arr2 []*Unit) bool {
 	for _, u1 := range arr1 {
 		inOtherArray := false
 		for _, u2 := range arr2 {
@@ -104,20 +119,21 @@ func (g *GameObjects) DrawGameObjects(screen *ebiten.Image, camera render.ICamer
 // Update updates all relevent information for gameObjects
 func (g *GameObjects) Update() {
 	for _, u := range g.Units {
-		u.PositionComponent.MoveTowardsDestination(g.getCollidableComponents())
+		u.PositionComponent.MoveTowardsDestination(g.GetCollidableComponents())
 	}
 }
 
 // SetUnitsDestinations sets the destination of all g.SelectedUnits to the point p
 func (g *GameObjects) SetUnitsDestinations(p *geometry.Point) {
-	mapRect := objects.GetMapRectangle(g.Tiles)
-	collidables := g.getCollidableComponents()
+	mapRect := GetMapRectangle(g.Tiles)
+	collidables := g.GetCollidableComponents()
 	for _, u := range g.SelectedUnits {
 		u.PositionComponent.SetDestination(*p, mapRect, collidables)
 	}
 }
 
-func (g *GameObjects) getCollidableComponents() []geometry.PositionComponent {
+// GetCollidableComponents gets all the collidable components in the gameObjects
+func (g *GameObjects) GetCollidableComponents() []geometry.PositionComponent {
 	nonPathableTiles := make([]geometry.PositionComponent, 0)
 	for _, tile := range g.Tiles {
 		if !tile.IsPathable {
@@ -128,8 +144,8 @@ func (g *GameObjects) getCollidableComponents() []geometry.PositionComponent {
 }
 
 // SelectUnits selects all g.Units which intersect with the selectionRect
-func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*objects.Unit {
-	selectedUnits := make([]*objects.Unit, 0)
+func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*Unit {
+	selectedUnits := make([]*Unit, 0)
 	for _, unit := range g.Units {
 		if selectionRect.Intersects(*unit.PositionComponent.Rectangle) {
 			selectedUnits = append(selectedUnits, unit)
