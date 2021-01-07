@@ -6,8 +6,8 @@ type RenderComponent struct {
 }
 
 // NewRenderComponent creates a IRenderComponent object
-func NewRenderComponent(Name string) *RenderComponent {
-	return &RenderComponent{
+func NewRenderComponent(Name string) RenderComponent {
+	return RenderComponent{
 		Name: Name,
 	}
 }

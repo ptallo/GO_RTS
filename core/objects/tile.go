@@ -16,14 +16,14 @@ const (
 
 // Tile is an object describing a map tile
 type Tile struct {
-	RenderComponent   *render.RenderComponent
+	RenderComponent   render.RenderComponent
 	PositionComponent *geometry.PositionComponent
 	IsPathable        bool
 }
 
 // Equals checks whether this tile is equal to another tile
 func (t Tile) Equals(t2 Tile) bool {
-	return t.RenderComponent.Equals(*t2.RenderComponent) && t.PositionComponent.Equals(*t2.PositionComponent) && t.IsPathable == t2.IsPathable
+	return t.RenderComponent.Equals(t2.RenderComponent) && t.PositionComponent.Equals(*t2.PositionComponent) && t.IsPathable == t2.IsPathable
 }
 
 // NewMapFromFile loads a map from a file

@@ -9,7 +9,7 @@ func Test_GivenIdenticalComponent_WhenCheckingEquality_ThenReturnsTrue(t *testin
 	r1 := render.NewRenderComponent("test")
 	r2 := render.NewRenderComponent("test")
 
-	if !r1.Equals(*r2) {
+	if !r1.Equals(r2) {
 		t.Error("identical render components should return true when checking equality")
 	}
 }
@@ -18,7 +18,7 @@ func Test_GivenNonIdenticalComponents_WhenCheckingEquality_ThenReturnsFalse(t *t
 	r1 := render.NewRenderComponent("test")
 	r2 := render.NewRenderComponent("test2")
 
-	if r1.Equals(*r2) {
+	if r1.Equals(r2) {
 		t.Error("identical render components should return true when checking equality")
 	}
 }

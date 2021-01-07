@@ -7,7 +7,7 @@ import (
 
 // Unit is an object describing a game unit
 type Unit struct {
-	RenderComponent   *render.RenderComponent
+	RenderComponent   render.RenderComponent
 	PositionComponent *geometry.PositionComponent
 }
 
@@ -22,5 +22,5 @@ func NewUnit(startPosition geometry.Point) *Unit {
 
 // Equals returns true if the two units are identical
 func (u Unit) Equals(u2 Unit) bool {
-	return u.RenderComponent.Equals(*u2.RenderComponent) && u.PositionComponent.Equals(*u2.PositionComponent)
+	return u.RenderComponent.Equals(u2.RenderComponent) && u.PositionComponent.Equals(*u2.PositionComponent)
 }
