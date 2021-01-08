@@ -7,13 +7,10 @@ import (
 )
 
 func main() {
-
 	width, height := 800, 600
-	g := core.NewGame(width, height)
 	ebiten.SetWindowSize(width, height)
 	ebiten.SetWindowTitle("Go RTS")
-	if err := ebiten.RunGame(&g); err != nil {
+	if err := ebiten.RunGame(core.NewGame(width, height)); err != nil {
 		panic(err)
 	}
-
 }

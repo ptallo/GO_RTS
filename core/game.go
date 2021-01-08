@@ -16,9 +16,9 @@ type Game struct {
 }
 
 // NewGame a shorcut method to instantiate a game object
-func NewGame(width, height int) Game {
+func NewGame(width, height int) *Game {
 	c := &Container{}
-	game := Game{
+	game := &Game{
 		width:       width,
 		height:      height,
 		container:   c,
@@ -30,18 +30,20 @@ func NewGame(width, height int) Game {
 	})
 
 	game.container.GetEventHandler().OnLBR(func(r geometry.Rectangle) {
-		cameraTranslation := *game.container.GetCamera().Translation()
-		r.Point.Translate(cameraTranslation)
+		cameraTranslation := game.container.GetCamera().Translation()
+		r = r.Move(cameraTranslation)
 		game.gameObjects.SelectedUnits = game.gameObjects.SelectUnits(r)
 	})
 
 	game.container.GetEventHandler().OnRBP(func(p geometry.Point) {
-		cameraTranslation := *game.container.GetCamera().Translation()
-		p.Translate(cameraTranslation)
+		cameraTranslation := game.container.GetCamera().Translation()
+		p = p.Move(cameraTranslation)
 		game.gameObjects.SetUnitsDestinations(&p)
 	})
 
-	game.container.GetEventHandler().OnGameObjectsChanged(game.SetGameObjects)
+	game.container.GetEventHandler().OnGameObjectsChanged(func(gameObjs objects.GameObjects) {
+		game.gameObjects = &gameObjs
+	})
 
 	go func() {
 		for {
@@ -62,11 +64,6 @@ func (g *Game) Update() error {
 	g.container.GetMouse().Update()
 	g.container.GetEventHandler().Listen()
 	return nil
-}
-
-// SetGameObjects takes a new gameObjects object and overwrites the current one
-func (g *Game) SetGameObjects(gameObjs *objects.GameObjects) {
-	g.gameObjects.Copy(gameObjs)
 }
 
 // Draw is used to draw any relevant images on the screen

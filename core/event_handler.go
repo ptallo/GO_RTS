@@ -26,8 +26,8 @@ type EventHandler struct {
 	RightButtonPressedListener  chan geometry.Point
 	rightButtonPressedFunctions []func(geometry.Point)
 
-	GameObjectsChangedListener  chan *objects.GameObjects
-	gameObjectsChangedFunctions []func(*objects.GameObjects)
+	GameObjectsChangedListener  chan objects.GameObjects
+	gameObjectsChangedFunctions []func(objects.GameObjects)
 }
 
 // NewEventHandler initializes all relevent event listeners the game will need
@@ -39,8 +39,8 @@ func NewEventHandler(mouse input.IMouse, tcpClient *networking.TCPClient) *Event
 		leftButtonReleasedFunctions: []func(geometry.Rectangle){},
 		RightButtonPressedListener:  make(chan geometry.Point, 1),
 		rightButtonPressedFunctions: []func(geometry.Point){},
-		GameObjectsChangedListener:  make(chan *objects.GameObjects, 1),
-		gameObjectsChangedFunctions: []func(*objects.GameObjects){},
+		GameObjectsChangedListener:  make(chan objects.GameObjects, 1),
+		gameObjectsChangedFunctions: []func(objects.GameObjects){},
 	}
 
 	mouse.LeftButtonPressedEvent().Subscribe(ev.LeftButtonPressedListener)
@@ -102,6 +102,6 @@ func (ev *EventHandler) OnRBP(fn func(geometry.Point)) {
 }
 
 // OnGameObjectsChanged subscribes the 'fn' argument to be called with the GameObjectsChanged event fires
-func (ev *EventHandler) OnGameObjectsChanged(fn func(*objects.GameObjects)) {
+func (ev *EventHandler) OnGameObjectsChanged(fn func(objects.GameObjects)) {
 	ev.gameObjectsChangedFunctions = append(ev.gameObjectsChangedFunctions, fn)
 }

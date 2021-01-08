@@ -2,6 +2,7 @@ package objects
 
 import (
 	"bufio"
+	"fmt"
 	"go_rts/core/geometry"
 	"go_rts/core/render"
 	"os"
@@ -28,6 +29,8 @@ func (t Tile) Equals(t2 Tile) bool {
 
 // NewMapFromFile loads a map from a file
 func NewMapFromFile(filePath string) []*Tile {
+	dir, err := os.Getwd()
+	fmt.Println(dir)
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)

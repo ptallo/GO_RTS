@@ -39,11 +39,10 @@ func (c *Container) GetSpriteSheetLibrary() render.ISpriteSheetLibrary {
 
 // GetCamera will lazy-load a singleton camera object
 func (c *Container) GetCamera() render.ICamera {
-	p := geometry.NewPoint(0, 0)
 	if c.camera == nil {
 		c.camera = render.NewCamera(
 			c.GetSpriteSheetLibrary(),
-			&p,
+			geometry.NewPoint(0, 0),
 			5.0,
 		)
 	}

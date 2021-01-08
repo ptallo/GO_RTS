@@ -81,7 +81,7 @@ func tryToMoveOutsideMap(t *testing.T, goalDestination, expectedDestination geom
 	p.SetDestination(goalDestination, mapRect, []geometry.PositionComponent{})
 
 	// Assert
-	actualDestination := *p.GoalDestination
+	actualDestination := p.GoalDestination
 	if !expectedDestination.Equals(actualDestination) {
 		t.Errorf("actual destination %v should equal expected destinaton %v", actualDestination, expectedDestination)
 	}
@@ -102,7 +102,7 @@ func Test_GivenUnpathableComponent_WhenMoving_ThenCannotMoveThrough(t *testing.T
 	}
 
 	// Assert
-	if p1.Rectangle.Point.Equals(goalDestination) || p1.Rectangle.Intersects(*pc.Rectangle) {
+	if p1.Rectangle.Point.Equals(goalDestination) || p1.Rectangle.Intersects(pc.Rectangle) {
 		t.Error("shouldn't be able to move into un-pathable component")
 	}
 }

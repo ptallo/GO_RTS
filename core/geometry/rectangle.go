@@ -9,7 +9,7 @@ import (
 type Rectangle struct {
 	Width  float64
 	Height float64
-	Point  *Point
+	Point  Point
 }
 
 // NewRectangle is a shortcut to define a new rectangle
@@ -18,7 +18,7 @@ func NewRectangle(w, h, x, y float64) Rectangle {
 	return Rectangle{
 		Width:  w,
 		Height: h,
-		Point:  &p,
+		Point:  p,
 	}
 }
 
@@ -34,7 +34,7 @@ func NewRectangleFromPoints(p1, p2 Point) Rectangle {
 
 // Equals checks to see if this rect is equal to another
 func (r Rectangle) Equals(r2 Rectangle) bool {
-	return r.Point.Equals(*r2.Point) && r.Width == r2.Width && r.Height == r.Height
+	return r.Point.Equals(r2.Point) && r.Width == r2.Width && r.Height == r.Height
 }
 
 // IsAdjacentTo checkts to see if this rect exists next to another in 2d space
@@ -63,6 +63,15 @@ func (r Rectangle) IsLeftAdjacent(r2 Rectangle) bool {
 // IsRightAdjacent returns true if r is right of r2 else false
 func (r Rectangle) IsRightAdjacent(r2 Rectangle) bool {
 	return r.Point.X == r2.Point.X+r2.Width && r.Point.Y == r2.Point.Y && r.Height == r2.Height
+}
+
+// Move returns a new rectangle whose point is r.Point.Move(p)
+func (r Rectangle) Move(p Point) Rectangle {
+	return Rectangle{
+		Width:  r.Width,
+		Height: r.Height,
+		Point:  r.Point.Move(p),
+	}
 }
 
 // Intersects checks if one rectangle intersects another rectangle

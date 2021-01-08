@@ -10,7 +10,7 @@ import (
 type ICamera interface {
 	Draw(*ebiten.Image, RenderComponent, geometry.Point)
 	UpdateCameraPosition(float64, float64, geometry.Rectangle)
-	Translation() *geometry.Point
+	Translation() geometry.Point
 }
 
 // ISpriteSheetLibrary is an interface which defines a central store for sprite sheets

@@ -9,12 +9,12 @@ import (
 // Camera is an object used to track how the screen has moved in a game
 type Camera struct {
 	ssl         ISpriteSheetLibrary
-	translation *geometry.Point
+	translation geometry.Point
 	Speed       float64
 }
 
 // NewCamera is a shortcut to creating a Camera object
-func NewCamera(ssl ISpriteSheetLibrary, t *geometry.Point, s float64) ICamera {
+func NewCamera(ssl ISpriteSheetLibrary, t geometry.Point, s float64) ICamera {
 	return &Camera{
 		ssl:         ssl,
 		translation: t,
@@ -37,7 +37,7 @@ func (c *Camera) Draw(screen *ebiten.Image, renderComponent RenderComponent, poi
 func (c *Camera) UpdateCameraPosition(screenWidth, screenHeight float64, mapRect geometry.Rectangle) {
 	moves := c.getCameraMovements()
 	for _, move := range moves {
-		c.translation.Translate(move)
+		c.translation = c.translation.Move(move)
 	}
 
 	screenRect := geometry.NewRectangle(
@@ -49,7 +49,7 @@ func (c *Camera) UpdateCameraPosition(screenWidth, screenHeight float64, mapRect
 
 	if !screenRect.Intersects(mapRect) {
 		for _, move := range moves {
-			c.translation.Translate(move)
+			c.translation = c.translation.Move(move)
 		}
 	}
 }
@@ -78,6 +78,6 @@ func (c *Camera) getCameraMovements() []geometry.Point {
 }
 
 // Translation gives the cameras current position
-func (c *Camera) Translation() *geometry.Point {
+func (c *Camera) Translation() geometry.Point {
 	return c.translation
 }
