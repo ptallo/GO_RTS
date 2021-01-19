@@ -9,19 +9,21 @@ import (
 
 // GameObjects is a contianer for holding game information
 type GameObjects struct {
+	UIDHandler    *UIDHandler
 	Tiles         []*Tile
 	Units         []*Unit
-	SelectedUnits []*Unit
+	SelectedUnits []int
 }
 
 // NewGameObjects returns a standard initialization of the gameobjects
 func NewGameObjects() *GameObjects {
-	unit1 := NewUnit(geometry.NewPoint(100.0, 200.0))
-	unit2 := NewUnit(geometry.NewPoint(100.0, 300.0))
+	uidHandler := &UIDHandler{}
+	unit1 := NewUnit(uidHandler.getNewUID(), geometry.NewPoint(100.0, 200.0))
+	unit2 := NewUnit(uidHandler.getNewUID(), geometry.NewPoint(100.0, 300.0))
 	return &GameObjects{
 		Tiles:         NewMapFromFile("../assets/maps/map1.txt"),
 		Units:         []*Unit{unit1, unit2},
-		SelectedUnits: []*Unit{},
+		SelectedUnits: []int{},
 	}
 }
 
@@ -47,8 +49,12 @@ func (g *GameObjects) Update() {
 func (g *GameObjects) SetUnitsDestinations(p *geometry.Point) {
 	mapRect := GetMapRectangle(g.Tiles)
 	collidables := g.GetCollidableComponents()
-	for _, u := range g.SelectedUnits {
-		u.PositionComponent.SetDestination(*p, mapRect, collidables)
+	for _, uid := range g.SelectedUnits {
+		for _, unit := range g.Units {
+			if unit.UID == uid {
+				unit.PositionComponent.SetDestination(*p, mapRect, collidables)
+			}
+		}
 	}
 }
 
@@ -64,11 +70,11 @@ func (g *GameObjects) GetCollidableComponents() []geometry.PositionComponent {
 }
 
 // SelectUnits selects all g.Units which intersect with the selectionRect
-func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []*Unit {
-	selectedUnits := make([]*Unit, 0)
+func (g *GameObjects) SelectUnits(selectionRect geometry.Rectangle) []int {
+	selectedUnits := make([]int, 0)
 	for _, unit := range g.Units {
 		if selectionRect.Intersects(unit.PositionComponent.Rectangle) {
-			selectedUnits = append(selectedUnits, unit)
+			selectedUnits = append(selectedUnits, unit.UID)
 		}
 	}
 	return selectedUnits

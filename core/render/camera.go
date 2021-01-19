@@ -35,6 +35,10 @@ func (c *Camera) Draw(screen *ebiten.Image, renderComponent RenderComponent, poi
 
 // UpdateCameraPosition will update the camera position according to GetCameraMovements if the screen will still overlap the map
 func (c *Camera) UpdateCameraPosition(screenWidth, screenHeight float64, mapRect geometry.Rectangle) {
+	if !ebiten.IsFocused() {
+		return
+	}
+
 	moves := c.getCameraMovements()
 	for _, move := range moves {
 		c.translation = c.translation.Move(move)

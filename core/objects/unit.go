@@ -7,13 +7,15 @@ import (
 
 // Unit is an object describing a game unit
 type Unit struct {
+	UID               int
 	RenderComponent   render.RenderComponent
 	PositionComponent *geometry.PositionComponent
 }
 
 // NewUnit is a shorcut for creating a NewUnit
-func NewUnit(startPosition geometry.Point) *Unit {
+func NewUnit(uid int, startPosition geometry.Point) *Unit {
 	u := Unit{
+		UID:               uid,
 		RenderComponent:   render.NewRenderComponent("man"),
 		PositionComponent: geometry.NewPositionComponent(geometry.NewRectangle(20.0, 20.0, startPosition.X, startPosition.Y), 0.5),
 	}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"go_rts/core/geometry"
+	"go_rts/core/networking"
 	"go_rts/core/objects"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,41 +18,41 @@ type Game struct {
 
 // NewGame a shorcut method to instantiate a game object
 func NewGame(width, height int) *Game {
-	c := &Container{}
 	game := &Game{
 		width:       width,
 		height:      height,
-		container:   c,
+		container:   &Container{},
 		gameObjects: &objects.GameObjects{},
 	}
 
-	game.container.GetEventHandler().OnLBP(func(p geometry.Point) {
-		game.gameObjects.SelectedUnits = []*objects.Unit{}
-	})
-
-	game.container.GetEventHandler().OnLBR(func(r geometry.Rectangle) {
-		cameraTranslation := game.container.GetCamera().Translation()
-		r = r.Move(cameraTranslation)
-		game.gameObjects.SelectedUnits = game.gameObjects.SelectUnits(r)
-	})
-
-	game.container.GetEventHandler().OnRBP(func(p geometry.Point) {
-		cameraTranslation := game.container.GetCamera().Translation()
-		p = p.Move(cameraTranslation)
-		game.gameObjects.SetUnitsDestinations(&p)
-	})
-
-	game.container.GetEventHandler().OnGameObjectsChanged(func(gameObjs objects.GameObjects) {
-		game.gameObjects = &gameObjs
-	})
-
-	go func() {
-		for {
-			game.container.GetTCPClient().Listen()
-		}
-	}()
+	game.RegisterEvents()
+	go game.container.GetTCPClient().ListenForGameObjects()
 
 	return game
+}
+
+// RegisterEvents registers the corresponding events from the event handler with the game
+func (g *Game) RegisterEvents() {
+	g.container.GetEventHandler().OnLBP(func(p geometry.Point) {
+		comm := networking.NewDeselectUnitsCommand(p)
+		g.container.GetTCPClient().SendCommand(comm)
+	})
+
+	g.container.GetEventHandler().OnLBR(func(r geometry.Rectangle) {
+		r = r.Move(g.container.GetCamera().Translation())
+		comm := networking.NewSelectUnitsCommand(r)
+		g.container.GetTCPClient().SendCommand(comm)
+	})
+
+	g.container.GetEventHandler().OnRBP(func(p geometry.Point) {
+		p = p.Move(g.container.GetCamera().Translation())
+		comm := networking.NewSetDestinationCommand(p)
+		g.container.GetTCPClient().SendCommand(comm)
+	})
+
+	g.container.GetEventHandler().OnGameObjectsChanged(func(gameObjs objects.GameObjects) {
+		g.gameObjects = &gameObjs
+	})
 }
 
 // Update is used to update all the game logic
