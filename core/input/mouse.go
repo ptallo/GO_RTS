@@ -1,21 +1,12 @@
-package core
+package input
 
 import (
-	"go_rts/geometry"
+	"go_rts/core/geometry"
 	"image/color"
 
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/hajimehoshi/ebiten/v2"
 )
-
-// IMouse defines an interface for wrapping any mouse system
-type IMouse interface {
-	Update()
-	Draw(*ebiten.Image)
-	LeftButtonPressedEvent() *event.Feed
-	LeftButtonReleasedEvent() *event.Feed
-	RightButtonPressedEvent() *event.Feed
-}
 
 // Mouse is an object wrapping all ebiten mouse utilities
 type Mouse struct {

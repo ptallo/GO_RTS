@@ -9,12 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-
-// ISpriteSheetLibrary is an interface which defines a central store for sprite sheets
-type ISpriteSheetLibrary interface {
-	GetSpriteSheet(string) *SpriteSheet
-}
-
 // SpriteSheetLibrary is a wrapper around a map[string]*SpriteSheet
 type SpriteSheetLibrary struct {
 	Library map[string]*SpriteSheet
@@ -41,14 +35,14 @@ type SpriteSheetDefinition struct {
 
 // NewSpriteSheet is a shortcut to load a spritesheet given the name of the asset dir and the name of the asset
 func NewSpriteSheet(assetDir, name string) (*SpriteSheet, error) {
-	jsonPath := fmt.Sprintf("./assets/%v/%v.json", assetDir, name)
+	jsonPath := fmt.Sprintf("../assets/%v/%v.json", assetDir, name)
 	ssd, err := NewSpriteSheetDefinitionFromJSON(jsonPath)
 
 	if err != nil {
 		return nil, err
 	}
 
-	imgPath := fmt.Sprintf("./assets/%v/%v.png", assetDir, name)
+	imgPath := fmt.Sprintf("../assets/%v/%v.png", assetDir, name)
 	img, err := NewImageFromPath(imgPath)
 
 	if err != nil {

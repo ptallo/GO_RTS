@@ -1,16 +1,19 @@
 package core
 
 import (
-	"go_rts/geometry"
-	"go_rts/render"
+	"go_rts/core/geometry"
+	"go_rts/core/input"
+	"go_rts/core/networking"
+	"go_rts/core/render"
 )
 
 // Container is an object which holds objects for the game
 type Container struct {
 	spriteSheetLibrary render.ISpriteSheetLibrary
 	camera             render.ICamera
-	mouse              IMouse
+	mouse              input.IMouse
 	eventHandler       *EventHandler
+	tcpClient          *networking.TCPClient
 }
 
 // GetSpriteSheetLibrary will lazy-load a singleton SpriteSheetLibrary object
@@ -36,10 +39,10 @@ func (c *Container) GetSpriteSheetLibrary() render.ISpriteSheetLibrary {
 
 // GetCamera will lazy-load a singleton camera object
 func (c *Container) GetCamera() render.ICamera {
-	p := geometry.NewPoint(0, 0)
 	if c.camera == nil {
 		c.camera = render.NewCamera(
-			&p,
+			c.GetSpriteSheetLibrary(),
+			geometry.NewPoint(0, 0),
 			5.0,
 		)
 	}
@@ -47,17 +50,25 @@ func (c *Container) GetCamera() render.ICamera {
 }
 
 // GetMouse will lazy-load a singleton mouse object
-func (c *Container) GetMouse() IMouse {
+func (c *Container) GetMouse() input.IMouse {
 	if c.mouse == nil {
-		c.mouse = NewMouse()
+		c.mouse = input.NewMouse()
 	}
 	return c.mouse
+}
+
+// GetTCPClient will lazy-load a TCPClient with a live tcp connection
+func (c *Container) GetTCPClient() *networking.TCPClient {
+	if c.tcpClient == nil {
+		c.tcpClient = networking.NewTCPClient()
+	}
+	return c.tcpClient
 }
 
 // GetEventHandler will lazy-load a singleton EventHandler
 func (c *Container) GetEventHandler() *EventHandler {
 	if c.eventHandler == nil {
-		c.eventHandler = NewEventHandler()
+		c.eventHandler = NewEventHandler(c.GetMouse(), c.GetTCPClient())
 	}
 	return c.eventHandler
 }
